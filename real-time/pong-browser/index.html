@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Pong</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #setup {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 1px solid #0f0;
+        }
+
+        #setup input, #setup select, #setup button {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px;
+            margin: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        #setup button {
+            cursor: pointer;
+        }
+
+        #setup button:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        #gameCanvas {
+            display: block;
+            border: 2px solid #0f0;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: right;
+            font-size: 18px;
+        }
+
+        #score {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="setup">
+        <input type="text" id="gameId" value="demo" placeholder="Game ID">
+        <select id="playerNum">
+            <option value="1">P1</option>
+            <option value="2">P2</option>
+        </select>
+        <button id="connectBtn">CONNECT</button>
+        <div id="status">Ready</div>
+    </div>
+
+    <div id="info">
+        <div id="score">0 : 0</div>
+        <div id="serving"></div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <!-- MQTT.js from CDN -->
+    <script src="https://unpkg.com/mqtt@5.3.5/dist/mqtt.min.js"></script>
+
+    <script>
+        // Read player number from URL parameter (?player=1 or ?player=2)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPlayer = urlParams.get('player');
+
+        if (urlPlayer === '1' || urlPlayer === '2') {
+            // Auto-select player from URL
+            window.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('playerNum').value = urlPlayer;
+            });
+        }
+
+        // Game constants
+        const COURT_WIDTH = 800;
+        const COURT_HEIGHT = 400;
+        const PADDLE_WIDTH = 10;
+        const PADDLE_HEIGHT = 80;
+        const BALL_SIZE = 10;
+        const PADDLE_SPEED = 8;
+
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
+        let gameState = {
+            ball: { x: COURT_WIDTH / 2, y: COURT_HEIGHT / 2, dx: 0, dy: 0 },
+            p1: { y: COURT_HEIGHT / 2 - PADDLE_HEIGHT / 2, score: 0 },
+            p2: { y: COURT_HEIGHT / 2 - PADDLE_HEIGHT / 2, score: 0 },
+            status: 'waiting',
+            servingPlayer: null
+        };
+
+        let myPlayerNum = 1;
+        let gameId = 'browser-demo';
+        let mqttClient = null;
+        let isConnected = false;
+
+        // MQTT connection
+        function connectToGame() {
+            const gameIdInput = document.getElementById('gameId').value.trim();
+            const playerSelect = document.getElementById('playerNum').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const connectBtn = document.getElementById('connectBtn');
+
+            if (!gameIdInput) {
+                showError('Please enter a Game ID');
+                return;
+            }
+
+            gameId = gameIdInput;
+            myPlayerNum = parseInt(playerSelect);
+
+            connectBtn.disabled = true;
+            updateStatus('Connecting...');
+            errorMsg.classList.add('hidden');
+
+            // Connect to Raptor public MQTT broker with WebSocket support
+            const brokerUrl = 'ws://3.141.116.27:9001';
+
+            mqttClient = mqtt.connect(brokerUrl, {
+                clientId: `pong-browser-${Date.now()}`,
+                username: 'raptor',
+                password: 'raptorMQTT2025',
+                keepalive: 20,
+                reconnectPeriod: 500,
+                clean: false  // Persist session
+            });
+
+            mqttClient.on('connect', () => {
+                isConnected = true;
+                updateStatus('Connected!');
+                connectBtn.textContent = 'Connected';
+
+                // Subscribe to game topics
+                mqttClient.subscribe(`pong/game/${gameId}/#`);
+
+                // Announce join
+                mqttClient.publish(
+                    `pong/game/${gameId}/join`,
+                    JSON.stringify({ player: myPlayerNum, timestamp: Date.now() })
+                );
+            });
+
+            mqttClient.on('message', (topic, message) => {
+                handleMessage(topic, message.toString());
+            });
+
+            mqttClient.on('error', (err) => {
+                console.error('MQTT Error:', err);
+                showError('Connection failed. Make sure the broker supports WebSockets on port 9001.');
+                connectBtn.disabled = false;
+                updateStatus('Connection Error');
+            });
+
+            mqttClient.on('offline', () => {
+                updateStatus('Reconnecting...');
+            });
+        }
+
+        function handleMessage(topic, message) {
+            const parts = topic.split('/');
+            const messageType = parts[3];
+            const data = JSON.parse(message);
+
+            if (messageType === 'p1' || messageType === 'p2') {
+                const player = messageType === 'p1' ? 'p1' : 'p2';
+                gameState[player].y = data.y;
+            } else if (messageType === 'ball') {
+                gameState.ball = data;
+            } else if (messageType === 'state') {
+                gameState.p1.score = data.p1Score;
+                gameState.p2.score = data.p2Score;
+                gameState.status = data.status;
+                gameState.servingPlayer = data.servingPlayer;
+                updateScore();
+                updateServing();
+            }
+        }
+
+        function publishPaddle(y) {
+            if (!mqttClient || !isConnected) return;
+            mqttClient.publish(
+                `pong/game/${gameId}/p${myPlayerNum}/paddle`,
+                JSON.stringify({ y, timestamp: Date.now() })
+            );
+        }
+
+        function publishServe() {
+            if (!mqttClient || !isConnected) return;
+            mqttClient.publish(
+                `pong/game/${gameId}/serve`,
+                JSON.stringify({ player: myPlayerNum, timestamp: Date.now() })
+            );
+        }
+
+        function publishRestart() {
+            if (!mqttClient || !isConnected) return;
+            mqttClient.publish(
+                `pong/game/${gameId}/restart`,
+                JSON.stringify({ timestamp: Date.now() })
+            );
+        }
+
+        // Keyboard controls
+        const keys = {};
+
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+
+            // Serve
+            if (e.key === ' ' && gameState.servingPlayer === myPlayerNum) {
+                e.preventDefault();
+                publishServe();
+            }
+
+            // Restart
+            if (e.key.toLowerCase() === 'r' && gameState.status === 'ended') {
+                e.preventDefault();
+                publishRestart();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Game loop - handle input and rendering
+        function gameLoop() {
+            // Handle paddle movement
+            if (gameState.status === 'playing') {
+                const myPaddle = myPlayerNum === 1 ? gameState.p1 : gameState.p2;
+                let newY = myPaddle.y;
+
+                if (keys['ArrowUp'] || keys['w'] || keys['W']) {
+                    newY = Math.max(0, myPaddle.y - PADDLE_SPEED);
+                }
+                if (keys['ArrowDown'] || keys['s'] || keys['S']) {
+                    newY = Math.min(COURT_HEIGHT - PADDLE_HEIGHT, myPaddle.y + PADDLE_SPEED);
+                }
+
+                if (newY !== myPaddle.y) {
+                    // Update locally for instant response
+                    myPaddle.y = newY;
+                    // Send to server
+                    publishPaddle(newY);
+                }
+            }
+
+            // Render
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, COURT_WIDTH, COURT_HEIGHT);
+
+            // Draw center line
+            ctx.strokeStyle = '#333';
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(COURT_WIDTH / 2, 0);
+            ctx.lineTo(COURT_WIDTH / 2, COURT_HEIGHT);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw paddles
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(20, gameState.p1.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+            ctx.fillRect(COURT_WIDTH - 20 - PADDLE_WIDTH, gameState.p2.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+            // Draw ball
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(gameState.ball.x - BALL_SIZE/2, gameState.ball.y - BALL_SIZE/2, BALL_SIZE, BALL_SIZE);
+
+            // Draw status text
+            if (gameState.status === 'waiting') {
+                ctx.fillStyle = '#0f0';
+                ctx.font = '30px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText('WAITING...', COURT_WIDTH / 2, COURT_HEIGHT / 2);
+            } else if (gameState.status === 'ended') {
+                ctx.fillStyle = '#0f0';
+                ctx.font = '40px Courier New';
+                ctx.textAlign = 'center';
+                const winner = gameState.p1.score > gameState.p2.score ? 'P1' : 'P2';
+                ctx.fillText(`${winner} WINS`, COURT_WIDTH / 2, COURT_HEIGHT / 2);
+                ctx.font = '20px Courier New';
+                ctx.fillText('[R] RESTART', COURT_WIDTH / 2, COURT_HEIGHT / 2 + 40);
+            }
+        }
+
+        function updateStatus(text) {
+            document.getElementById('status').textContent = text;
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent =
+                `${gameState.p1.score} : ${gameState.p2.score}`;
+        }
+
+        function updateServing() {
+            const servingEl = document.getElementById('serving');
+            if (gameState.servingPlayer === myPlayerNum) {
+                servingEl.textContent = '[SPACE TO SERVE]';
+            } else {
+                servingEl.textContent = '';
+            }
+        }
+
+        // Connect button
+        document.getElementById('connectBtn').addEventListener('click', connectToGame);
+
+        // Start render loop
+        gameLoop();
+    </script>
+</body>
+</html>

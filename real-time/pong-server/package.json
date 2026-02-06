@@ -1,0 +1,23 @@
+{
+  "name": "pong-server",
+  "version": "1.0.0",
+  "description": "Authoritative game server for MQTT Pong",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": ["mqtt", "game-server", "pong", "iot"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mqtt": "^5.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

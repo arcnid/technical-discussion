@@ -1,0 +1,22 @@
+[Unit]
+Description=Pong Game Server (Authoritative MQTT)
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/pong-server
+ExecStart=/usr/bin/node /home/ec2-user/pong-server/dist/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pong-server
+
+# Environment variables
+Environment=MQTT_BROKER=mqtt://localhost:1883
+Environment=MQTT_USER=raptor
+Environment=MQTT_PASS=raptorMQTT2025
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+{
+  "name": "pong-browser",
+  "version": "1.0.0",
+  "description": "Browser-based MQTT Pong game - connects to Raptor public broker",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "p1": "node server.js --open=1",
+    "p2": "node server.js --open=2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arcnid/pong.git"
+  }
+}
