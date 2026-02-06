@@ -21,6 +21,7 @@ $temperature = getTemperature();
 ```
 
 **How it works:**
+
 - User clicks link or submits form
 - Browser sends HTTP request
 - Server queries database, generates HTML
@@ -28,6 +29,7 @@ $temperature = getTemperature();
 - Connection closes
 
 **Limitations:**
+
 - Full page reload required for any update
 - No automatic updates when data changes
 - High server load (generates HTML on every request)
@@ -51,6 +53,7 @@ $("#refresh-button").click(function () {
 ```
 
 **How it works:**
+
 - User clicks button
 - JavaScript sends HTTP request in background
 - Server returns JSON data (not full HTML)
@@ -58,6 +61,7 @@ $("#refresh-button").click(function () {
 - Connection closes
 
 **Limitations:**
+
 - Still requires user action (button click)
 - No automatic updates
 - Each request creates new HTTP connection
@@ -81,12 +85,14 @@ setInterval(function () {
 ```
 
 **How it works:**
+
 - JavaScript automatically sends request every N seconds
 - Server responds with current data
 - Connection closes after each response
 - Repeat indefinitely
 
 **Limitations:**
+
 - Wastes bandwidth (requests even when data unchanged)
 - Fixed latency (up to N seconds before seeing updates)
 - Scalability issues: 100 clients polling every 5s = 1,200 requests/minute
@@ -135,6 +141,7 @@ echo json_encode(['temp' => $currentTemp]);
 ```
 
 **How it works:**
+
 - Client sends request
 - Server holds connection open (doesn't respond immediately)
 - When data changes, server responds and closes connection
@@ -142,10 +149,12 @@ echo json_encode(['temp' => $currentTemp]);
 - If timeout expires, server responds with current data anyway
 
 **Improvements:**
+
 - Lower latency (responds immediately when data changes)
 - Fewer requests than polling (only when data changes)
 
 **Limitations:**
+
 - Still uses HTTP request/response model
 - Server resources held during wait (one thread per connection)
 - Doesn't scale well (100 concurrent connections = 100 server threads)
@@ -189,18 +198,21 @@ wss.on("connection", (ws) => {
 ```
 
 **How it works:**
+
 - HTTP handshake upgrades connection to WebSocket
 - Connection stays open indefinitely
 - Both client and server can send messages anytime
 - No connection overhead after initial handshake
 
 **Improvements:**
+
 - True bidirectional communication
 - Server pushes updates instantly
 - Low overhead (no HTTP headers on each message)
 - One connection handles all messages
 
 **Use cases:**
+
 - Real-time dashboards
 - Chat applications
 - Live notifications
@@ -241,12 +253,14 @@ client.on("message", (topic, message) => {
 ```
 
 **How it works:**
+
 - All clients connect to central broker (not to each other)
 - Publishers send messages to topics
 - Subscribers receive messages from topics they subscribe to
 - Broker routes messages based on topic patterns
 
 **Advantages over WebSockets:**
+
 - Decoupled: publishers don't know about subscribers
 - One-to-many: publish once, unlimited subscribers
 - Quality of Service (QoS): guaranteed message delivery
@@ -254,6 +268,7 @@ client.on("message", (topic, message) => {
 - Lightweight: minimal overhead for IoT devices
 
 **Use cases:**
+
 - IoT sensor networks
 - Industrial control systems
 - Home automation
@@ -263,30 +278,32 @@ client.on("message", (topic, message) => {
 
 ## Comparison Summary
 
-| Method            | Connection Type | Latency      | Bandwidth     | Scalability | Complexity |
-| ----------------- | --------------- | ------------ | ------------- | ----------- | ---------- |
-| Server-Side       | Per request     | High         | High          | Low         | Low        |
-| AJAX              | Per request     | High         | Medium        | Low         | Low        |
-| Polling           | Per request     | Medium-High  | High          | Low         | Medium     |
-| Long Polling      | Held open       | Low          | Medium        | Medium      | High       |
-| WebSockets        | Persistent      | Very Low     | Low           | High        | Medium     |
-| MQTT              | Persistent      | Very Low     | Very Low      | Very High   | Medium     |
+| Method       | Connection Type | Latency     | Bandwidth | Scalability | Complexity |
+| ------------ | --------------- | ----------- | --------- | ----------- | ---------- |
+| Server-Side  | Per request     | High        | High      | Low         | Low        |
+| AJAX         | Per request     | High        | Medium    | Low         | Low        |
+| Polling      | Per request     | Medium-High | High      | Low         | Medium     |
+| Long Polling | Held open       | Low         | Medium    | Medium      | High       |
+| WebSockets   | Persistent      | Very Low    | Low       | High        | Medium     |
+| MQTT         | Persistent      | Very Low    | Very Low  | Very High   | Medium     |
 
 ---
 
 ## MQTT for Industrial Systems
 
-MQTT is the protocol used in the Raptor grain bin control system. Same concepts as the game demo below, but controlling real hardware.
+MQTT is the protocol used in the Raptor control system. Same concepts as the game demo below, but controlling real hardware.
 
 **Example: Grain bin temperature monitoring**
 
 Traditional polling approach:
+
 - Dashboard polls sensor every 10 seconds
 - Sensor responds with temperature
 - If temperature unchanged: 8,640 wasted requests per day
 - Each new dashboard multiplies the requests
 
 MQTT approach:
+
 - Sensor publishes temperature changes to topic: `raptor/site1/bin3/temp`
 - Dashboards subscribe to topic
 - Temperature unchanged for 1 hour: zero messages
@@ -294,6 +311,7 @@ MQTT approach:
 - Temperature spikes: all dashboards notified within 1 second
 
 **Raptor System Topics:**
+
 ```
 raptor/
   shop/
@@ -329,6 +347,7 @@ Terminal 1              MQTT Broker              Terminal 2
 5. Broker routes messages to subscribers
 
 **Topic Structure:**
+
 ```
 pong/
   game/
@@ -350,13 +369,13 @@ This shows every message flowing through the broker. Same pattern used to monito
 
 **Pattern Comparison:**
 
-| Pong Game                  | Raptor System                 |
-| -------------------------- | ----------------------------- |
-| `pong/game/demo/p1/paddle` | `raptor/shop/device-1/state`  |
-| Paddle Y position (int)    | Motor RPM (int)               |
-| Ball position updates      | Temperature readings          |
-| Score change               | Alarm trigger                 |
-| 60 messages/second         | 0.5 messages/second           |
+| Pong Game                  | Raptor System                |
+| -------------------------- | ---------------------------- |
+| `pong/game/demo/p1/paddle` | `raptor/shop/device-1/state` |
+| Paddle Y position (int)    | Motor RPM (int)              |
+| Ball position updates      | Temperature readings         |
+| Score change               | Alarm trigger                |
+| 60 messages/second         | 0.5 messages/second          |
 
 Same protocol. Same pattern. Different data.
 
@@ -365,6 +384,7 @@ Same protocol. Same pattern. Different data.
 ## Running the Demo
 
 **Prerequisites:**
+
 - Node.js 18+
 - MQTT broker access (we'll use the Raptor cloud broker)
 - Two terminals
@@ -392,22 +412,26 @@ See [pong-mqtt/README.md](./pong-mqtt/README.md) for full instructions.
 ## Key Concepts
 
 **Publish/Subscribe:**
+
 - Publishers send messages to topics
 - Subscribers receive messages from topics
 - Publisher doesn't know who's subscribed
 - Subscriber doesn't know who published
 
 **Topics:**
+
 - Hierarchical structure: `domain/location/device/metric`
 - Wildcards: `+` (single level), `#` (multi-level)
 - Example: `raptor/+/+/state` subscribes to all device states
 
 **Quality of Service (QoS):**
+
 - QoS 0: Fire and forget (best effort)
 - QoS 1: At least once (guaranteed delivery)
 - QoS 2: Exactly once (highest overhead)
 
 **Retained Messages:**
+
 - Broker stores last message for topic
 - New subscribers immediately receive last value
 - Useful for state (e.g., "motor running")
@@ -425,6 +449,7 @@ See [pong-mqtt/README.md](./pong-mqtt/README.md) for full instructions.
 ## Summary
 
 **Evolution:**
+
 1. Server-side rendering: Full page reload per update
 2. AJAX: Partial updates, still manual
 3. Polling: Automatic but wasteful
@@ -433,12 +458,14 @@ See [pong-mqtt/README.md](./pong-mqtt/README.md) for full instructions.
 6. MQTT: Pub/sub, decoupled, scalable
 
 **When to use MQTT:**
+
 - IoT devices with intermittent connectivity
 - One-to-many communication
 - Decoupled systems
 - Guaranteed message delivery needed
 
 **When to use WebSockets:**
+
 - Browser-based applications
 - Direct client-server communication
 - Lower latency requirements

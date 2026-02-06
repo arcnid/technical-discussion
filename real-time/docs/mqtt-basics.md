@@ -23,10 +23,11 @@ A device or application that **publishes messages** to topics.
 
 ```javascript
 // A temperature sensor publishing data
-client.publish('sensors/temperature', '72.5');
+client.publish("sensors/temperature", "72.5");
 ```
 
 Examples:
+
 - Temperature sensor publishing every 5 seconds
 - Motor controller publishing RPM
 - Door sensor publishing open/close events
@@ -38,20 +39,21 @@ A device or application that **subscribes to topics** to receive messages.
 
 ```javascript
 // A dashboard subscribing to temperature
-client.subscribe('sensors/temperature');
+client.subscribe("sensors/temperature");
 
-client.on('message', (topic, message) => {
+client.on("message", (topic, message) => {
   console.log(`Temp: ${message.toString()}°F`);
 });
 ```
 
 Examples:
+
 - Dashboard displaying sensor data
 - Alert system watching for critical values
 - Logger recording all events
 - Your Pong game receiving opponent's paddle position
 
-### 3. Broker (The Traffic Cop)
+### 3. Broker (Traffic Handler)
 
 The central server that routes messages from publishers to subscribers.
 
@@ -62,6 +64,7 @@ Sensor B ──publish──> Broker ──route──> Logger
 ```
 
 **Popular brokers:**
+
 - Eclipse Mosquitto (what we use in Raptor)
 - HiveMQ
 - EMQX
@@ -78,6 +81,7 @@ building/floor/room/device/metric
 ### Real Examples
 
 **Factory Setup:**
+
 ```
 factory/
   building-1/
@@ -100,29 +104,32 @@ factory/
 ```
 
 **Subscribe Examples:**
+
 ```javascript
 // Specific: Just motor-1 RPM
-client.subscribe('factory/building-1/line-a/motor-1/rpm');
+client.subscribe("factory/building-1/line-a/motor-1/rpm");
 
 // Single wildcard (+): All motors on line-a
-client.subscribe('factory/building-1/line-a/+/rpm');
+client.subscribe("factory/building-1/line-a/+/rpm");
 
 // Multi wildcard (#): Everything in building-1
-client.subscribe('factory/building-1/#');
+client.subscribe("factory/building-1/#");
 
 // Everything from all motors
-client.subscribe('factory/+/+/+/rpm');
+client.subscribe("factory/+/+/+/rpm");
 ```
 
 ### Topic Best Practices
 
 **DO:**
+
 - Use lowercase with hyphens: `grain-bin/temp`
 - Start general, end specific: `site/device/metric`
 - Be consistent: always `temperature` not sometimes `temp`
 - Use meaningful names: `motor-rpm` not `mr`
 
 **DON'T:**
+
 - Use spaces: `grain bin` (use `grain-bin`)
 - Mix conventions: `GrainBin/temp` and `grain-bin/Temp`
 - Start with `/`: `/sensors/temp` (just `sensors/temp`)
@@ -135,14 +142,16 @@ MQTT lets you choose reliability level per message:
 ### QoS 0: At Most Once (Fire and Forget)
 
 ```javascript
-client.publish('sensors/temp', '72', { qos: 0 });
+client.publish("sensors/temp", "72", { qos: 0 });
 ```
 
 **Flow:**
+
 1. Publisher sends message
 2. Done (no confirmation)
 
 **Use for:**
+
 - High-frequency sensor data (temp every second)
 - Status updates where latest value is all that matters
 - Non-critical notifications
@@ -152,15 +161,17 @@ client.publish('sensors/temp', '72', { qos: 0 });
 ### QoS 1: At Least Once (Acknowledged)
 
 ```javascript
-client.publish('commands/start-motor', 'START', { qos: 1 });
+client.publish("commands/start-motor", "START", { qos: 1 });
 ```
 
 **Flow:**
+
 1. Publisher sends message
 2. Broker acknowledges receipt
 3. If no ack, publisher resends
 
 **Use for:**
+
 - Important data that must arrive
 - Commands where duplicates are safe
 - Logging events
@@ -170,16 +181,18 @@ client.publish('commands/start-motor', 'START', { qos: 1 });
 ### QoS 2: Exactly Once (Guaranteed)
 
 ```javascript
-client.publish('critical/emergency-stop', 'STOP', { qos: 2 });
+client.publish("critical/emergency-stop", "STOP", { qos: 2 });
 ```
 
 **Flow:**
+
 1. Publisher sends message
 2. Broker acknowledges
 3. Publisher confirms acknowledgment
 4. Broker confirms confirmation
 
 **Use for:**
+
 - Critical commands (emergency stop)
 - Financial transactions
 - State changes that can't duplicate
@@ -192,24 +205,27 @@ The broker can **remember** the last message on a topic:
 
 ```javascript
 // Publish with retain flag
-client.publish('devices/status', 'online', { retain: true });
+client.publish("devices/status", "online", { retain: true });
 ```
 
 **Why this matters:**
 
 Without retain:
+
 ```
 11:00 AM - Device publishes "online"
 11:30 AM - Dashboard connects → sees nothing
 ```
 
 With retain:
+
 ```
 11:00 AM - Device publishes "online" (retained)
 11:30 AM - Dashboard connects → immediately gets "online"
 ```
 
 **Use for:**
+
 - Status messages (online/offline)
 - Configuration values
 - Last known state
@@ -220,17 +236,18 @@ With retain:
 Tell the broker "if I disconnect unexpectedly, publish this message":
 
 ```javascript
-const client = mqtt.connect('mqtt://broker', {
+const client = mqtt.connect("mqtt://broker", {
   will: {
-    topic: 'devices/status',
-    payload: 'offline',
+    topic: "devices/status",
+    payload: "offline",
     qos: 1,
-    retain: true
-  }
+    retain: true,
+  },
 });
 ```
 
 **Flow:**
+
 1. Device connects with LWT configured
 2. Everything works normally
 3. Device suddenly loses power
@@ -238,6 +255,7 @@ const client = mqtt.connect('mqtt://broker', {
 5. Broker publishes the LWT message
 
 **Use for:**
+
 - Device online/offline status
 - Heartbeat monitoring
 - Detecting failures
@@ -249,8 +267,8 @@ const client = mqtt.connect('mqtt://broker', {
 ### Clean Session (true)
 
 ```javascript
-const client = mqtt.connect('mqtt://broker', {
-  clean: true
+const client = mqtt.connect("mqtt://broker", {
+  clean: true,
 });
 ```
 
@@ -262,9 +280,9 @@ const client = mqtt.connect('mqtt://broker', {
 ### Persistent Session (false)
 
 ```javascript
-const client = mqtt.connect('mqtt://broker', {
+const client = mqtt.connect("mqtt://broker", {
   clean: false,
-  clientId: 'dashboard-main'  // Must have unique ID
+  clientId: "dashboard-main", // Must have unique ID
 });
 ```
 
@@ -276,56 +294,57 @@ const client = mqtt.connect('mqtt://broker', {
 ## Connection Example (Putting It All Together)
 
 ```javascript
-const mqtt = require('mqtt');
+const mqtt = require("mqtt");
 
 // Connect with full options
-const client = mqtt.connect('mqtt://broker.local:1883', {
-  clientId: 'sensor-' + Math.random().toString(16).substr(2, 8),
-  clean: false,              // Persistent session
-  keepalive: 60,             // Ping every 60 seconds
-  reconnectPeriod: 5000,     // Auto-reconnect after 5s
-  username: 'device1',       // Optional authentication
-  password: 'secret123',
-  will: {                    // Last Will and Testament
-    topic: 'devices/sensor-1/status',
-    payload: 'offline',
+const client = mqtt.connect("mqtt://broker.local:1883", {
+  clientId: "sensor-" + Math.random().toString(16).substr(2, 8),
+  clean: false, // Persistent session
+  keepalive: 60, // Ping every 60 seconds
+  reconnectPeriod: 5000, // Auto-reconnect after 5s
+  username: "device1", // Optional authentication
+  password: "secret123",
+  will: {
+    // Last Will and Testament
+    topic: "devices/sensor-1/status",
+    payload: "offline",
     qos: 1,
-    retain: true
-  }
+    retain: true,
+  },
 });
 
 // Connection successful
-client.on('connect', () => {
-  console.log('Connected to broker');
+client.on("connect", () => {
+  console.log("Connected to broker");
 
   // Publish status
-  client.publish('devices/sensor-1/status', 'online', {
+  client.publish("devices/sensor-1/status", "online", {
     qos: 1,
-    retain: true
+    retain: true,
   });
 
   // Subscribe to commands
-  client.subscribe('devices/sensor-1/commands', { qos: 1 });
+  client.subscribe("devices/sensor-1/commands", { qos: 1 });
 });
 
 // Receive messages
-client.on('message', (topic, message) => {
+client.on("message", (topic, message) => {
   console.log(`${topic}: ${message.toString()}`);
 
-  if (topic === 'devices/sensor-1/commands') {
+  if (topic === "devices/sensor-1/commands") {
     handleCommand(message.toString());
   }
 });
 
 // Connection lost
-client.on('offline', () => {
-  console.log('Disconnected, will auto-reconnect');
+client.on("offline", () => {
+  console.log("Disconnected, will auto-reconnect");
 });
 
 // Publish sensor data every 5 seconds
 setInterval(() => {
   const temp = readTemperature();
-  client.publish('sensors/temperature', temp.toString(), { qos: 0 });
+  client.publish("sensors/temperature", temp.toString(), { qos: 0 });
 }, 5000);
 ```
 
@@ -337,14 +356,16 @@ Matches exactly one level:
 
 ```javascript
 // Subscribe to all motors on line-a
-client.subscribe('factory/building-1/line-a/+/rpm');
+client.subscribe("factory/building-1/line-a/+/rpm");
 ```
 
 **Matches:**
+
 - `factory/building-1/line-a/motor-1/rpm` ✅
 - `factory/building-1/line-a/motor-2/rpm` ✅
 
 **Doesn't match:**
+
 - `factory/building-1/line-a/rpm` ❌ (no device level)
 - `factory/building-1/line-a/motor-1/temp` ❌ (not rpm)
 - `factory/building-1/line-b/motor-1/rpm` ❌ (wrong line)
@@ -355,39 +376,42 @@ Matches zero or more levels (must be last):
 
 ```javascript
 // Subscribe to everything from motor-1
-client.subscribe('factory/building-1/line-a/motor-1/#');
+client.subscribe("factory/building-1/line-a/motor-1/#");
 ```
 
 **Matches:**
+
 - `factory/building-1/line-a/motor-1/rpm` ✅
 - `factory/building-1/line-a/motor-1/temp` ✅
 - `factory/building-1/line-a/motor-1/status/alarm` ✅
 
 **Common Patterns:**
+
 ```javascript
 // Everything (caution: high volume!)
-client.subscribe('#');
+client.subscribe("#");
 
 // Everything in a building
-client.subscribe('factory/building-1/#');
+client.subscribe("factory/building-1/#");
 
 // All metrics from all devices
-client.subscribe('factory/+/+/+/#');
+client.subscribe("factory/+/+/+/#");
 ```
 
 ## MQTT vs HTTP: When to Use What
 
-| Feature | MQTT | HTTP/REST |
-|---------|------|-----------|
-| Connection | Persistent | Request/response |
-| Direction | Bidirectional | Client-initiated |
-| Overhead | Very low (2 bytes) | High (headers) |
-| Real-time | Excellent | Poor (polling) |
-| Pub/Sub | Native | Requires extra work |
-| Caching | Retained messages | HTTP caches |
-| Use case | IoT, real-time | Web APIs, CRUD |
+| Feature    | MQTT               | HTTP/REST           |
+| ---------- | ------------------ | ------------------- |
+| Connection | Persistent         | Request/response    |
+| Direction  | Bidirectional      | Client-initiated    |
+| Overhead   | Very low (2 bytes) | High (headers)      |
+| Real-time  | Excellent          | Poor (polling)      |
+| Pub/Sub    | Native             | Requires extra work |
+| Caching    | Retained messages  | HTTP caches         |
+| Use case   | IoT, real-time     | Web APIs, CRUD      |
 
 **Use MQTT when:**
+
 - Connecting hardware devices
 - Real-time updates needed
 - Many devices publishing to many subscribers
@@ -395,6 +419,7 @@ client.subscribe('factory/+/+/+/#');
 - Bandwidth is limited
 
 **Use HTTP when:**
+
 - Traditional web API
 - Request/response pattern fits naturally
 - Existing infrastructure required
@@ -406,24 +431,24 @@ client.subscribe('factory/+/+/+/#');
 
 ```javascript
 // 100 sensors publishing
-sensor.publish('farm/bin-1/temp', '72');
-sensor.publish('farm/bin-2/temp', '68');
+sensor.publish("farm/bin-1/temp", "72");
+sensor.publish("farm/bin-2/temp", "68");
 // ...
 
 // One dashboard subscribing to all
-dashboard.subscribe('farm/+/temp');
+dashboard.subscribe("farm/+/temp");
 ```
 
 ### Pattern 2: Command & Control
 
 ```javascript
 // Control system publishes commands
-control.publish('motors/motor-1/cmd', 'START');
+control.publish("motors/motor-1/cmd", "START");
 
 // Motor subscribes to its commands
-motor.subscribe('motors/motor-1/cmd');
-motor.on('message', (topic, msg) => {
-  if (msg.toString() === 'START') {
+motor.subscribe("motors/motor-1/cmd");
+motor.on("message", (topic, msg) => {
+  if (msg.toString() === "START") {
     startMotor();
   }
 });
@@ -434,28 +459,32 @@ motor.on('message', (topic, msg) => {
 ```javascript
 // Device publishes heartbeat
 setInterval(() => {
-  device.publish('devices/device-1/heartbeat', Date.now(), {
+  device.publish("devices/device-1/heartbeat", Date.now(), {
     qos: 1,
-    retain: true
+    retain: true,
   });
 }, 10000);
 
 // Monitor subscribes
-monitor.subscribe('devices/+/heartbeat');
+monitor.subscribe("devices/+/heartbeat");
 ```
 
 ### Pattern 4: Event Logging
 
 ```javascript
 // Multiple sources publish events
-motor.publish('events/motor/fault', JSON.stringify({
-  timestamp: Date.now(),
-  error: 'overcurrent',
-  value: 15.2
-}), { qos: 1 });
+motor.publish(
+  "events/motor/fault",
+  JSON.stringify({
+    timestamp: Date.now(),
+    error: "overcurrent",
+    value: 15.2,
+  }),
+  { qos: 1 },
+);
 
 // Logger captures all
-logger.subscribe('events/#');
+logger.subscribe("events/#");
 ```
 
 ## Try It Yourself
@@ -501,6 +530,7 @@ In the Raptor system, we use MQTT for:
 - **Faults:** VFD publishes alarms (QoS 1 to ensure delivery)
 
 **Topics:**
+
 ```
 raptor/
   shop/              # Site
@@ -516,6 +546,7 @@ When you play the Pong demo and subscribe to `pong/game/#`, you're seeing exactl
 ## Summary
 
 MQTT is:
+
 - **Lightweight** - Perfect for constrained devices
 - **Pub/Sub** - Publishers and subscribers are decoupled
 - **Reliable** - QoS levels ensure delivery guarantees
