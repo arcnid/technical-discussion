@@ -156,8 +156,8 @@
             updateStatus('Connecting...');
             errorMsg.classList.add('hidden');
 
-            // Connect to Raptor public MQTT broker with WebSocket support
-            const brokerUrl = 'ws://3.141.116.27:9001';
+            // Connect to local MQTT broker with WebSocket support
+            const brokerUrl = 'ws://localhost:9001';
 
             mqttClient = mqtt.connect(brokerUrl, {
                 clientId: `pong-browser-${Date.now()}`,
