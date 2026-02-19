@@ -99,10 +99,6 @@ client.on('message', (topic, message) => {
       const player = messageType === 'p1' ? 1 : 2;
       state = updatePaddle(state, player, paddleData.y);
       setGame(gameId, state);
-
-      // Publish authoritative paddle position back to ALL clients (including sender)
-      // This ensures everyone stays in sync even after reconnections
-      publishPaddle(gameId, player, paddleData.y);
     }
 
     // Handle join messages
@@ -113,16 +109,16 @@ client.on('message', (topic, message) => {
 
       console.log(`👋 Player ${joinData.player} joined game ${gameId}`);
 
-      // Check if both players have joined and game hasn't started yet
+      // Always publish current state so the joining client knows the game status
+      // (including 'ended', so the client can immediately send a restart)
       if (state.status === 'waiting' && bothPlayersJoined(state)) {
         state = startGame(state);
         setGame(gameId, state);
-        publishGameState(gameId, state);
         console.log(`▶️  Game ${gameId} started! Both players ready.`);
       } else if (state.status === 'waiting') {
-        publishGameState(gameId, state);
         console.log(`⏳ Game ${gameId} waiting for ${state.playersJoined.has(1) ? 'player 2' : 'player 1'}...`);
       }
+      publishGameState(gameId, state);
     }
 
     // Handle restart messages

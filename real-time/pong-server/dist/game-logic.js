@@ -5,8 +5,8 @@ export const createGameState = () => ({
     ball: {
         x: GAME_CONSTANTS.COURT_WIDTH / 2,
         y: GAME_CONSTANTS.COURT_HEIGHT / 2,
-        dx: 0, // Ball starts stationary
-        dy: 0,
+        dx: GAME_CONSTANTS.BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+        dy: GAME_CONSTANTS.BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
     },
     p1: { y: GAME_CONSTANTS.COURT_HEIGHT / 2 - GAME_CONSTANTS.PADDLE_HEIGHT / 2 },
     p2: { y: GAME_CONSTANTS.COURT_HEIGHT / 2 - GAME_CONSTANTS.PADDLE_HEIGHT / 2 },
@@ -14,7 +14,7 @@ export const createGameState = () => ({
     p2Score: 0,
     status: 'waiting',
     playersJoined: new Set(),
-    servingPlayer: 1, // Player 1 serves first
+    servingPlayer: null, // No serving
 });
 // Pure function: Update paddle position
 export const updatePaddle = (state, player, y) => {
@@ -179,17 +179,19 @@ export const gameTick = (state) => {
     if (state.status !== 'playing') {
         return state;
     }
-    // If someone is serving, attach ball to their paddle
-    if (state.servingPlayer !== null) {
-        return attachBallToPaddle(state);
-    }
-    // Update ball physics (only if ball is in play)
+    // Update ball physics
     const { ball, scored } = updateBall(state.ball, state.p1.y, state.p2.y);
     // Handle scoring
     if (scored !== null) {
         let newState = updateScore(state, scored);
-        newState = setServingPlayer(newState, scored); // Set who serves next
-        newState = { ...newState, ball: resetBall() }; // Reset ball position
+        // Reset ball with random direction
+        const newBall = {
+            x: GAME_CONSTANTS.COURT_WIDTH / 2,
+            y: GAME_CONSTANTS.COURT_HEIGHT / 2,
+            dx: GAME_CONSTANTS.BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+            dy: GAME_CONSTANTS.BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+        };
+        newState = { ...newState, ball: newBall };
         // Check if game should end
         if (shouldEndGame(newState)) {
             return endGame(newState);
