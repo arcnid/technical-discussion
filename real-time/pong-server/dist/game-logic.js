@@ -15,6 +15,7 @@ export const createGameState = () => ({
     status: 'waiting',
     playersJoined: new Set(),
     servingPlayer: null, // No serving
+    playersReady: new Set(), // No one ready yet
 });
 // Pure function: Update paddle position
 export const updatePaddle = (state, player, y) => {
@@ -113,6 +114,19 @@ export const addPlayer = (state, player) => {
 export const bothPlayersJoined = (state) => {
     return state.playersJoined.has(1) && state.playersJoined.has(2);
 };
+// Pure function: Mark player as ready
+export const addPlayerReady = (state, player) => {
+    const newPlayersReady = new Set(state.playersReady);
+    newPlayersReady.add(player);
+    return {
+        ...state,
+        playersReady: newPlayersReady,
+    };
+};
+// Pure function: Check if both players are ready
+export const bothPlayersReady = (state) => {
+    return state.playersReady.has(1) && state.playersReady.has(2);
+};
 // Pure function: Start game
 export const startGame = (state) => ({
     ...state,
@@ -122,6 +136,7 @@ export const startGame = (state) => ({
 export const resetGame = (state) => ({
     ...createGameState(),
     playersJoined: state.playersJoined, // Keep the players joined
+    playersReady: new Set(), // Clear ready state on restart
     status: 'playing', // Start immediately since players are already here
 });
 // Pure function: Attach ball to serving player's paddle
@@ -168,6 +183,7 @@ export const setServingPlayer = (state, scoringPlayer) => {
 export const endGame = (state) => ({
     ...state,
     status: 'ended',
+    playersReady: new Set(), // Clear ready state when game ends
 });
 // Pure function: Check if game should end
 export const shouldEndGame = (state) => {

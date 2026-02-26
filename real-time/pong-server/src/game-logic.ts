@@ -18,6 +18,7 @@ export const createGameState = (): GameState => ({
   status: 'waiting',
   playersJoined: new Set(),
   servingPlayer: null,  // No serving
+  playersReady: new Set(),  // No one ready yet
 });
 
 // Pure function: Update paddle position
@@ -147,6 +148,21 @@ export const bothPlayersJoined = (state: GameState): boolean => {
   return state.playersJoined.has(1) && state.playersJoined.has(2);
 };
 
+// Pure function: Mark player as ready
+export const addPlayerReady = (state: GameState, player: 1 | 2): GameState => {
+  const newPlayersReady = new Set(state.playersReady);
+  newPlayersReady.add(player);
+  return {
+    ...state,
+    playersReady: newPlayersReady,
+  };
+};
+
+// Pure function: Check if both players are ready
+export const bothPlayersReady = (state: GameState): boolean => {
+  return state.playersReady.has(1) && state.playersReady.has(2);
+};
+
 // Pure function: Start game
 export const startGame = (state: GameState): GameState => ({
   ...state,
@@ -157,6 +173,7 @@ export const startGame = (state: GameState): GameState => ({
 export const resetGame = (state: GameState): GameState => ({
   ...createGameState(),
   playersJoined: state.playersJoined,  // Keep the players joined
+  playersReady: new Set(),  // Clear ready state on restart
   status: 'playing',  // Start immediately since players are already here
 });
 
@@ -209,6 +226,7 @@ export const setServingPlayer = (state: GameState, scoringPlayer: 1 | 2): GameSt
 export const endGame = (state: GameState): GameState => ({
   ...state,
   status: 'ended',
+  playersReady: new Set(),  // Clear ready state when game ends
 });
 
 // Pure function: Check if game should end

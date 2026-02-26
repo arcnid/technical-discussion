@@ -206,22 +206,37 @@ class ImageClassifier {
             images.forEach(img => img.dispose());
 
             console.log('Training tensor shapes:', xs.shape, ys.shape);
+            console.log('Training data count:', this.trainingData.length);
 
             // Training parameters
             const epochs = 20;
-            const batchSize = 8;
+            const batchSize = 4;  // Smaller batch size for better compatibility
+
+            // Create shuffled indices for showing images during training
+            const trainingSplitIndex = Math.floor(this.trainingData.length * 0.85);
+            const actualTrainingData = this.trainingData.slice(0, trainingSplitIndex);
+
+            let currentImageIndex = 0;
+            let batchCounter = 0;
 
             await this.model.fit(xs, ys, {
                 epochs: epochs,
                 batchSize: batchSize,
-                validationSplit: 0.2,
+                validationSplit: 0.15,  // Slightly smaller validation split
                 shuffle: true,
                 callbacks: {
-                    onBatchEnd: async (batch, logs) => {
-                        // Show random training images during training
-                        if (batch % 2 === 0) {
-                            this.showTrainingImages();
+                    onBatchBegin: async (batch, logs) => {
+                        // Show actual images being trained in this batch
+                        const startIdx = (currentImageIndex) % actualTrainingData.length;
+                        const batchImages = [];
+
+                        for (let i = 0; i < 6; i++) {
+                            const idx = (startIdx + i) % actualTrainingData.length;
+                            batchImages.push(actualTrainingData[idx]);
                         }
+
+                        this.showCurrentBatchImages(batchImages, batchCounter++);
+                        currentImageIndex += batchSize;
                     },
                     onEpochEnd: async (epoch, logs) => {
                         if (!this.isTraining) {
@@ -234,6 +249,9 @@ class ImageClassifier {
 
                         this.updateMetrics(epoch + 1, epochs, logs);
                         this.drawChart();
+
+                        // Reset image index for next epoch
+                        currentImageIndex = 0;
 
                         // Update predictions every few epochs
                         if ((epoch + 1) % 3 === 0 || epoch === epochs - 1) {
@@ -264,21 +282,18 @@ class ImageClassifier {
         }
     }
 
-    showTrainingImages() {
-        // Show 4 random training images
+    showCurrentBatchImages(batchImages, batchNum) {
+        // Show the actual images being trained on right now
         const grid = document.getElementById('predictions-grid');
-        grid.innerHTML = '<div style="grid-column: 1/-1; color: #667eea; font-weight: 600; text-align: center;">Training on images...</div>';
+        grid.innerHTML = `<div style="grid-column: 1/-1; color: #667eea; font-weight: 600; text-align: center; animation: pulse 0.5s;">
+            🔄 Training... (Batch ${batchNum})
+        </div>`;
 
-        const samples = [];
-        for (let i = 0; i < 4; i++) {
-            const randomIdx = Math.floor(Math.random() * this.trainingData.length);
-            samples.push(this.trainingData[randomIdx]);
-        }
-
-        samples.forEach(data => {
+        batchImages.forEach(data => {
             const item = document.createElement('div');
             item.className = 'prediction-item';
             item.style.animation = 'pulse 0.5s';
+            item.style.border = '2px solid #667eea';
 
             const img = document.createElement('img');
             img.src = data.img.src;
@@ -287,6 +302,7 @@ class ImageClassifier {
             label.className = 'prediction-label';
             label.textContent = this.classNames[data.label];
             label.style.fontSize = '0.85em';
+            label.style.color = '#667eea';
 
             item.appendChild(img);
             item.appendChild(label);
@@ -302,10 +318,10 @@ class ImageClassifier {
 
     preprocessImage(img) {
         return tf.tidy(() => {
-            // Convert image to tensor
-            let tensor = tf.browser.fromPixels(img);
+            // Convert image to tensor and immediately cast to float32
+            let tensor = tf.browser.fromPixels(img).toFloat();
 
-            // Resize to 64x64
+            // Resize to 64x64 (now working with float32)
             tensor = tf.image.resizeBilinear(tensor, [64, 64]);
 
             // Normalize to [0, 1]

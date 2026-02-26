@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import mqtt from 'mqtt';
-import { createGameState, updatePaddle, gameTick, startGame, addPlayer, bothPlayersJoined, resetGame, serveBall, } from './game-logic.js';
+import { createGameState, updatePaddle, gameTick, startGame, addPlayer, bothPlayersJoined, bothPlayersReady, addPlayerReady, resetGame, serveBall, } from './game-logic.js';
 // Configuration
 const BROKER_URL = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
 const MQTT_USER = process.env.MQTT_USER || 'raptor';
@@ -50,6 +50,7 @@ client.on('connect', () => {
     client.subscribe('pong/game/+/join', { qos: 0 });
     client.subscribe('pong/game/+/restart', { qos: 0 });
     client.subscribe('pong/game/+/serve', { qos: 0 });
+    client.subscribe('pong/game/+/ready', { qos: 0 });
     console.log('🎯 Subscribed to game topics');
     console.log('🚀 Server ready - waiting for players...\n');
 });
@@ -108,6 +109,21 @@ client.on('message', (topic, message) => {
                 state = serveBall(state);
                 setGame(gameId, state);
                 publishGameState(gameId, state);
+            }
+        }
+        // Handle ready messages (post-game restart coordination)
+        if (messageType === 'ready' && state.status === 'ended') {
+            const readyData = data;
+            state = addPlayerReady(state, readyData.player);
+            setGame(gameId, state);
+            console.log(`✋ Player ${readyData.player} is ready (${state.playersReady.size}/2)`);
+            // If both players are ready, restart the game
+            if (bothPlayersReady(state)) {
+                console.log(`🔄 Both players ready! Restarting game ${gameId}...`);
+                state = resetGame(state);
+                setGame(gameId, state);
+                publishGameState(gameId, state);
+                console.log(`▶️  Game ${gameId} restarted!`);
             }
         }
     }

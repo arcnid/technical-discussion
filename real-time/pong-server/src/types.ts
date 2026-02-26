@@ -18,6 +18,7 @@ export interface GameState {
   status: 'waiting' | 'playing' | 'ended';
   playersJoined: Set<1 | 2>;  // Track which players have joined
   servingPlayer: 1 | 2 | null;  // Who's serving (ball attached to their paddle)
+  playersReady: Set<1 | 2>;  // Track which players are ready (for post-game restart)
 }
 
 export interface PaddleUpdate {
@@ -45,7 +46,7 @@ export const GAME_CONSTANTS = {
   COURT_WIDTH: 40,
   COURT_HEIGHT: 12,
   PADDLE_HEIGHT: 3,
-  BALL_SPEED: 0.4,  // Balanced speed for good gameplay
+  BALL_SPEED: 0.3,  // Slightly slower for better playability
   FRAME_RATE: 60,
   WINNING_SCORE: 5,
 };

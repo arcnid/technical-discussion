@@ -16,6 +16,7 @@ export interface GameState {
     status: 'waiting' | 'playing' | 'ended';
     playersJoined: Set<1 | 2>;
     servingPlayer: 1 | 2 | null;
+    playersReady: Set<1 | 2>;
 }
 export interface PaddleUpdate {
     y: number;
