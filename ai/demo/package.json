@@ -4,7 +4,7 @@
   "description": "Live demonstration of a Convolutional Neural Network (CNN) training in real-time using TensorFlow.js.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test-training.js"
   },
   "keywords": [],
   "author": "",
