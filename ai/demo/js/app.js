@@ -194,7 +194,7 @@ class ImageClassifier {
         this.accHistory = [];
 
         try {
-            // Prepare training data
+            // Prepare training data - NO validation split to avoid tensor type issues
             console.log('Preparing training data...');
             const images = this.trainingData.map(d => this.preprocessImage(d.img));
             const labels = this.trainingData.map(d => d.label);
@@ -210,11 +210,7 @@ class ImageClassifier {
 
             // Training parameters
             const epochs = 20;
-            const batchSize = 4;  // Smaller batch size for better compatibility
-
-            // Create shuffled indices for showing images during training
-            const trainingSplitIndex = Math.floor(this.trainingData.length * 0.85);
-            const actualTrainingData = this.trainingData.slice(0, trainingSplitIndex);
+            const batchSize = 4;
 
             let currentImageIndex = 0;
             let batchCounter = 0;
@@ -222,17 +218,16 @@ class ImageClassifier {
             await this.model.fit(xs, ys, {
                 epochs: epochs,
                 batchSize: batchSize,
-                validationSplit: 0.15,  // Slightly smaller validation split
-                shuffle: true,
+                shuffle: true,  // No validation split - just train on all data
                 callbacks: {
                     onBatchBegin: async (batch, logs) => {
                         // Show actual images being trained in this batch
-                        const startIdx = (currentImageIndex) % actualTrainingData.length;
+                        const startIdx = (currentImageIndex) % this.trainingData.length;
                         const batchImages = [];
 
                         for (let i = 0; i < 6; i++) {
-                            const idx = (startIdx + i) % actualTrainingData.length;
-                            batchImages.push(actualTrainingData[idx]);
+                            const idx = (startIdx + i) % this.trainingData.length;
+                            batchImages.push(this.trainingData[idx]);
                         }
 
                         this.showCurrentBatchImages(batchImages, batchCounter++);
@@ -318,10 +313,13 @@ class ImageClassifier {
 
     preprocessImage(img) {
         return tf.tidy(() => {
-            // Convert image to tensor and immediately cast to float32
-            let tensor = tf.browser.fromPixels(img).toFloat();
+            // Convert image to tensor
+            let tensor = tf.browser.fromPixels(img);
 
-            // Resize to 64x64 (now working with float32)
+            // Cast to float32 FIRST
+            tensor = tf.cast(tensor, 'float32');
+
+            // Resize to 64x64
             tensor = tf.image.resizeBilinear(tensor, [64, 64]);
 
             // Normalize to [0, 1]
