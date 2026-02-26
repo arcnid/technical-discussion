@@ -157,7 +157,7 @@ class ImageClassifier {
 
         this.model.compile({
             optimizer: tf.train.adam(0.001),
-            loss: 'sparseCategoricalCrossentropy',
+            loss: 'categoricalCrossentropy',  // Use categorical instead of sparse
             metrics: ['accuracy']
         });
 
@@ -194,13 +194,15 @@ class ImageClassifier {
         this.accHistory = [];
 
         try {
-            // Prepare training data - NO validation split to avoid tensor type issues
+            // Prepare training data with one-hot encoding
             console.log('Preparing training data...');
             const images = this.trainingData.map(d => this.preprocessImage(d.img));
             const labels = this.trainingData.map(d => d.label);
 
             const xs = tf.stack(images);
-            const ys = tf.tensor1d(labels, 'int32');
+
+            // Convert labels to one-hot encoding (float32)
+            const ys = tf.oneHot(tf.tensor1d(labels, 'int32'), 2).cast('float32');
 
             // Clean up individual tensors
             images.forEach(img => img.dispose());
