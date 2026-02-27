@@ -118,6 +118,17 @@ h3 {
     background: #d0d0d0;
 }
 
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+}
+
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -291,4 +302,27 @@ footer {
         transform: scale(1);
         opacity: 1;
     }
+}
+
+.model-status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-left: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.model-status-badge.untrained {
+    background: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffc107;
+}
+
+.model-status-badge.trained {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #28a745;
 }

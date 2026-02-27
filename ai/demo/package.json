@@ -2,8 +2,9 @@
   "name": "demo",
   "version": "1.0.0",
   "description": "Live demonstration of a Convolutional Neural Network (CNN) training in real-time using TensorFlow.js.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "node test-training.js"
   },
   "keywords": [],
@@ -11,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "express": "^4.22.1",
     "puppeteer": "^24.37.5"
   }
 }

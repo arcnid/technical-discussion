@@ -11,26 +11,19 @@ class ImageClassifier {
         this.accHistory = [];
         this.classNames = ['Apple', 'Banana'];
 
-        // Actual files that exist in our data folder
+        // Actual files that exist in our data folder (verified real apples!)
         this.appleFiles = [
-            'apple_1.jpg', 'apple_2.jpg', 'apple_3.jpg', 'apple_4.jpg', 'apple_5.jpg',
-            'apple_6.jpg', 'apple_7.jpg', 'apple_8.jpg', 'apple_9.jpg', 'apple_10.jpg',
-            'apple_11.jpg', 'apple_12.jpg', 'apple_13.jpg', 'apple_15.jpg', 'apple_17.jpg',
-            'apple_19.jpg', 'apple_20.jpg', 'apple_21.jpg', 'apple_22.jpg', 'apple_23.jpg',
-            'apple_24.jpg', 'apple_25.jpg', 'apple_26.jpg', 'apple_30.jpg', 'apple_31.jpg',
-            'apple_32.jpg', 'apple_33.jpg', 'apple_36.jpg', 'apple_37.jpg', 'apple_38.jpg',
-            'apple_39.jpg'
+            'apple_1.jpg', 'apple_2.jpg', 'apple_3.jpg', 'apple_4.jpg', 'apple_7.jpg',
+            'apple_9.jpg', 'apple_13.jpg', 'apple_22.jpg',
+            'apple_40.jpg', 'apple_41.jpg', 'apple_42.jpg', 'apple_44.jpg',
+            'apple_47.jpg', 'apple_49.jpg', 'apple_50.jpg',
+            'apple_51.jpg', 'apple_52.jpg'
         ];
 
         this.bananaFiles = [
             'banana_1.jpg', 'banana_2.jpg', 'banana_3.jpg', 'banana_4.jpg', 'banana_5.jpg',
-            'banana_6.jpg', 'banana_7.jpg', 'banana_8.jpg', 'banana_9.jpg', 'banana_10.jpg',
-            'banana_11.jpg', 'banana_12.jpg', 'banana_13.jpg', 'banana_14.jpg', 'banana_15.jpg',
-            'banana_16.jpg', 'banana_17.jpg', 'banana_18.jpg', 'banana_19.jpg', 'banana_20.jpg',
-            'banana_21.jpg', 'banana_22.jpg', 'banana_23.jpg', 'banana_25.jpg', 'banana_27.jpg',
-            'banana_28.jpg', 'banana_29.jpg', 'banana_30.jpg', 'banana_31.jpg', 'banana_32.jpg',
-            'banana_33.jpg', 'banana_34.jpg', 'banana_35.jpg', 'banana_36.jpg', 'banana_37.jpg',
-            'banana_38.jpg', 'banana_39.jpg', 'banana_40.jpg'
+            'banana_7.jpg', 'banana_8.jpg', 'banana_10.jpg', 'banana_11.jpg',
+            'banana_13.jpg', 'banana_14.jpg', 'banana_15.jpg', 'banana_16.jpg', 'banana_17.jpg'
         ];
 
         this.init();
@@ -172,6 +165,24 @@ class ImageClassifier {
         document.getElementById('train-btn').addEventListener('click', () => this.startTraining());
         document.getElementById('stop-btn').addEventListener('click', () => this.stopTraining());
         document.getElementById('image-upload').addEventListener('change', (e) => this.testImage(e));
+        document.getElementById('open-data-btn').addEventListener('click', () => this.openTrainingData());
+    }
+
+    async openTrainingData() {
+        try {
+            const response = await fetch('/open-training-data');
+            const result = await response.json();
+
+            if (result.success) {
+                console.log('✅ Opened training data folder:', result.path);
+            } else {
+                console.error('❌ Failed to open folder');
+                alert('Could not open folder. Path: ~/technical-discussion/ai/demo/data');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Could not open folder. Path: ~/technical-discussion/ai/demo/data');
+        }
     }
 
     async startTraining() {
@@ -261,6 +272,11 @@ class ImageClassifier {
             // Training complete
             status.textContent = '✅ Training complete!';
             status.className = 'status complete';
+
+            // Update badge
+            const badge = document.getElementById('model-status-badge');
+            badge.textContent = '✅ Trained';
+            badge.className = 'model-status-badge trained';
 
             // Final predictions
             await this.updatePredictions();

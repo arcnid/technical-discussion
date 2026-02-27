@@ -17,7 +17,7 @@
         <div class="main-content">
             <!-- Left Panel: Controls & Info -->
             <div class="panel controls-panel">
-                <h2>Neural Network</h2>
+                <h2>Neural Network<span id="model-status-badge" class="model-status-badge untrained">⚠️ Untrained (Random Weights)</span></h2>
                 <div class="model-info">
                     <div class="info-item">
                         <span class="label">Architecture:</span>
@@ -35,6 +35,7 @@
 
                 <button id="train-btn" class="btn btn-primary">Start Training</button>
                 <button id="stop-btn" class="btn btn-secondary" disabled>Stop Training</button>
+                <button id="open-data-btn" class="btn btn-info">📂 View Training Data</button>
 
                 <div class="status" id="status">Ready to train</div>
 
@@ -84,6 +85,6 @@
         </footer>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
