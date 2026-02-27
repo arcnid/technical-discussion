@@ -27,6 +27,7 @@
 Artificial Intelligence has transitioned from a purely academic pursuit requiring specialized hardware and PhD-level expertise to something that can run in a web browser and be built in minutes. This document explores that journey, using a hands-on example to demystify the core concepts that power everything from simple image classifiers to ChatGPT.
 
 We'll examine:
+
 - The fundamental principles of machine learning
 - How neural networks actually work
 - The historical evolution of AI development tools
@@ -34,7 +35,7 @@ We'll examine:
 - The limitations and challenges of current AI systems
 - How small-scale examples relate to modern large language models
 
-By the end of this document, you'll understand not just *how* to build AI systems, but *why* they work and what's happening under the hood.
+By the end of this document, you'll understand not just _how_ to build AI systems, but _why_ they work and what's happening under the hood.
 
 ---
 
@@ -65,14 +66,14 @@ Input + Output → Rules (learned)
 Example:
 Input: 1000 emails
 Output: Labels (spam/not spam)
-Rules: Learned patterns like "contains 'viagra'" or "all caps subject line"
+Rules: Learned patterns like "contains 'Prize'" or "all caps subject line"
 ```
 
 Instead of programming rules, we provide examples and let the system discover the patterns.
 
 ### The Core Insight
 
-A spam filter doesn't need to know *what* spam is philosophically. It needs to recognize *patterns* in data that correlate with spam. Machine learning excels at finding these statistical patterns, especially when they're too complex for humans to articulate as explicit rules.
+A spam filter doesn't need to know _what_ spam is philosophically. It needs to recognize _patterns_ in data that correlate with spam. Machine learning excels at finding these statistical patterns, especially when they're too complex for humans to articulate as explicit rules.
 
 ---
 
@@ -85,25 +86,25 @@ An artificial neuron is inspired by biological neurons, though the similarity is
 ```javascript
 // A single artificial neuron
 function neuron(inputs, weights, bias) {
-    // 1. Multiply each input by its weight
-    let sum = 0;
-    for (let i = 0; i < inputs.length; i++) {
-        sum += inputs[i] * weights[i];
-    }
+  // 1. Multiply each input by its weight
+  let sum = 0;
+  for (let i = 0; i < inputs.length; i++) {
+    sum += inputs[i] * weights[i];
+  }
 
-    // 2. Add bias term
-    sum += bias;
+  // 2. Add bias term
+  sum += bias;
 
-    // 3. Apply activation function (ReLU)
-    const output = Math.max(0, sum);
+  // 3. Apply activation function (ReLU)
+  const output = Math.max(0, sum);
 
-    return output;
+  return output;
 }
 
 // Example:
-const inputs = [1.0, 0.5, 0.2];    // Three input values
-const weights = [0.3, 0.7, -0.1];  // Learned parameters
-const bias = 0.5;                   // Learned parameter
+const inputs = [1.0, 0.5, 0.2]; // Three input values
+const weights = [0.3, 0.7, -0.1]; // Learned parameters
+const bias = 0.5; // Learned parameter
 
 const result = neuron(inputs, weights, bias);
 // result = max(0, 1.0*0.3 + 0.5*0.7 + 0.2*(-0.1) + 0.5)
@@ -142,14 +143,14 @@ Output: [probability_apple, probability_banana]
 ```javascript
 // Simplified forward pass
 function forwardPass(image) {
-    let activation = image;
+  let activation = image;
 
-    // Pass through each layer
-    for (let layer of network.layers) {
-        activation = layer.compute(activation);
-    }
+  // Pass through each layer
+  for (let layer of network.layers) {
+    activation = layer.compute(activation);
+  }
 
-    return activation;  // Final prediction
+  return activation; // Final prediction
 }
 ```
 
@@ -158,17 +159,17 @@ function forwardPass(image) {
 ```javascript
 // Simplified backward pass
 function backwardPass(prediction, actualLabel) {
-    // 1. Calculate error
-    const error = prediction - actualLabel;
+  // 1. Calculate error
+  const error = prediction - actualLabel;
 
-    // 2. For each weight in the network:
-    for (let weight of allWeights) {
-        // How much did THIS weight contribute to the error?
-        const gradient = calculateGradient(weight, error);
+  // 2. For each weight in the network:
+  for (let weight of allWeights) {
+    // How much did THIS weight contribute to the error?
+    const gradient = calculateGradient(weight, error);
 
-        // Adjust weight in opposite direction of error
-        weight.value -= learningRate * gradient;
-    }
+    // Adjust weight in opposite direction of error
+    weight.value -= learningRate * gradient;
+  }
 }
 ```
 
@@ -211,6 +212,7 @@ def train_network(X, y, learning_rate=0.01):
 ```
 
 **Problems:**
+
 - Every new layer type required rewriting gradient calculations
 - Easy to make mathematical errors
 - No GPU acceleration out of the box
@@ -252,11 +254,13 @@ train = theano.function(
 ```
 
 **Improvements:**
+
 - Automatic differentiation (no manual gradient math!)
 - GPU acceleration
 - Symbolic computation for optimization
 
 **Remaining challenges:**
+
 - Still verbose and low-level
 - Steep learning curve
 - Static computation graphs (define first, run later)
@@ -296,12 +300,14 @@ with tf.Session() as sess:
 ```
 
 **Improvements:**
+
 - Production-ready (used by Google internally)
 - Distributed training
 - TensorBoard for visualization
 - Mobile deployment (TensorFlow Lite)
 
 **Remaining challenges:**
+
 - Verbose boilerplate (`Session`, `placeholder`, etc.)
 - Debugging difficult (static graphs)
 - Steep learning curve for beginners
@@ -342,20 +348,23 @@ AI enters the browser:
 // TensorFlow.js (2019)
 const model = tf.sequential();
 
-model.add(tf.layers.dense({ units: 128, activation: 'relu', inputShape: [784] }));
-model.add(tf.layers.dense({ units: 64, activation: 'relu' }));
-model.add(tf.layers.dense({ units: 10, activation: 'softmax' }));
+model.add(
+  tf.layers.dense({ units: 128, activation: "relu", inputShape: [784] }),
+);
+model.add(tf.layers.dense({ units: 64, activation: "relu" }));
+model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
 
 model.compile({
-    optimizer: 'adam',
-    loss: 'sparseCategoricalCrossentropy',
-    metrics: ['accuracy']
+  optimizer: "adam",
+  loss: "sparseCategoricalCrossentropy",
+  metrics: ["accuracy"],
 });
 
 await model.fit(xs, ys, { epochs: 10 });
 ```
 
 **Breakthrough:**
+
 - No installation required
 - Runs on any device with a browser
 - Privacy-preserving (data never leaves device)
@@ -400,35 +409,39 @@ Here's a complete neural network in TensorFlow.js:
 // This is the ENTIRE implementation
 const model = tf.sequential();
 
-model.add(tf.layers.conv2d({
+model.add(
+  tf.layers.conv2d({
     inputShape: [64, 64, 3],
     filters: 16,
     kernelSize: 3,
-    activation: 'relu'
-}));
+    activation: "relu",
+  }),
+);
 model.add(tf.layers.maxPooling2d({ poolSize: 2 }));
 
-model.add(tf.layers.conv2d({
+model.add(
+  tf.layers.conv2d({
     filters: 32,
     kernelSize: 3,
-    activation: 'relu'
-}));
+    activation: "relu",
+  }),
+);
 model.add(tf.layers.maxPooling2d({ poolSize: 2 }));
 
 model.add(tf.layers.flatten());
-model.add(tf.layers.dense({ units: 64, activation: 'relu' }));
+model.add(tf.layers.dense({ units: 64, activation: "relu" }));
 model.add(tf.layers.dropout({ rate: 0.5 }));
-model.add(tf.layers.dense({ units: 2, activation: 'softmax' }));
+model.add(tf.layers.dense({ units: 2, activation: "softmax" }));
 
 model.compile({
-    optimizer: tf.train.adam(0.001),
-    loss: 'categoricalCrossentropy',
-    metrics: ['accuracy']
+  optimizer: tf.train.adam(0.001),
+  loss: "categoricalCrossentropy",
+  metrics: ["accuracy"],
 });
 
 await model.fit(trainingData, labels, {
-    epochs: 20,
-    batchSize: 4
+  epochs: 20,
+  batchSize: 4,
 });
 
 const prediction = model.predict(newImage);
@@ -447,18 +460,19 @@ model.add(tf.layers.conv2d({ filters: 16, kernelSize: 3 }));
 **What TensorFlow actually does:**
 
 1. **Weight Initialization**
+
    ```javascript
    // Create 16 filters, each 3×3×3 (for RGB)
    for (let i = 0; i < 16; i++) {
-       const filter = new Float32Array(3 * 3 * 3);
+     const filter = new Float32Array(3 * 3 * 3);
 
-       // Xavier/He initialization for better convergence
-       const stddev = Math.sqrt(2.0 / (3 * 3 * 3));
-       for (let j = 0; j < filter.length; j++) {
-           filter[j] = randomNormal(0, stddev);
-       }
+     // Xavier/He initialization for better convergence
+     const stddev = Math.sqrt(2.0 / (3 * 3 * 3));
+     for (let j = 0; j < filter.length; j++) {
+       filter[j] = randomNormal(0, stddev);
+     }
 
-       const bias = 0.01 * Math.random();
+     const bias = 0.01 * Math.random();
    }
    ```
 
@@ -469,59 +483,62 @@ model.add(tf.layers.conv2d({ filters: 16, kernelSize: 3 }));
    - Set up memory pooling to avoid fragmentation
 
 3. **Forward Pass Implementation**
+
    ```javascript
    function convolve(input, filter, bias) {
-       const outputHeight = inputHeight - kernelSize + 1;
-       const outputWidth = inputWidth - kernelSize + 1;
-       const output = new Float32Array(outputHeight * outputWidth);
+     const outputHeight = inputHeight - kernelSize + 1;
+     const outputWidth = inputWidth - kernelSize + 1;
+     const output = new Float32Array(outputHeight * outputWidth);
 
-       for (let y = 0; y < outputHeight; y++) {
-           for (let x = 0; x < outputWidth; x++) {
-               let sum = 0;
+     for (let y = 0; y < outputHeight; y++) {
+       for (let x = 0; x < outputWidth; x++) {
+         let sum = 0;
 
-               // Slide 3×3 filter over image
-               for (let ky = 0; ky < 3; ky++) {
-                   for (let kx = 0; kx < 3; kx++) {
-                       for (let c = 0; c < 3; c++) {  // RGB channels
-                           const inputVal = input[y+ky][x+kx][c];
-                           const filterVal = filter[ky][kx][c];
-                           sum += inputVal * filterVal;
-                       }
-                   }
-               }
-
-               // Add bias and apply ReLU activation
-               output[y * outputWidth + x] = Math.max(0, sum + bias);
+         // Slide 3×3 filter over image
+         for (let ky = 0; ky < 3; ky++) {
+           for (let kx = 0; kx < 3; kx++) {
+             for (let c = 0; c < 3; c++) {
+               // RGB channels
+               const inputVal = input[y + ky][x + kx][c];
+               const filterVal = filter[ky][kx][c];
+               sum += inputVal * filterVal;
+             }
            }
-       }
+         }
 
-       return output;
+         // Add bias and apply ReLU activation
+         output[y * outputWidth + x] = Math.max(0, sum + bias);
+       }
+     }
+
+     return output;
    }
    ```
 
 4. **Backward Pass Implementation**
+
    ```javascript
    function backpropagateConv(outputGradient, input, filter) {
-       // For each weight in the filter
-       for (let ky = 0; ky < 3; ky++) {
-           for (let kx = 0; kx < 3; kx++) {
-               for (let c = 0; c < 3; c++) {
-                   let gradient = 0;
+     // For each weight in the filter
+     for (let ky = 0; ky < 3; ky++) {
+       for (let kx = 0; kx < 3; kx++) {
+         for (let c = 0; c < 3; c++) {
+           let gradient = 0;
 
-                   // Sum gradients from all positions where this weight was used
-                   for (let y = 0; y < outputHeight; y++) {
-                       for (let x = 0; x < outputWidth; x++) {
-                           gradient += outputGradient[y][x] * input[y+ky][x+kx][c];
-                       }
-                   }
-
-                   filterGradients[ky][kx][c] = gradient;
-               }
+           // Sum gradients from all positions where this weight was used
+           for (let y = 0; y < outputHeight; y++) {
+             for (let x = 0; x < outputWidth; x++) {
+               gradient += outputGradient[y][x] * input[y + ky][x + kx][c];
+             }
            }
-       }
 
-       // Propagate gradient to previous layer
-       return calculateInputGradient(outputGradient, filter);
+           filterGradients[ky][kx][c] = gradient;
+         }
+       }
+     }
+
+     // Propagate gradient to previous layer
+     return calculateInputGradient(outputGradient, filter);
    }
    ```
 
@@ -603,141 +620,166 @@ Split: 80% training (25 images), 20% testing (6 images)
 
 ```javascript
 class ImageClassifier {
-    constructor() {
-        this.model = null;
-        this.classNames = ['Apple', 'Banana'];
+  constructor() {
+    this.model = null;
+    this.classNames = ["Apple", "Banana"];
 
-        // Verified training images
-        this.appleFiles = [
-            'apple_1.jpg', 'apple_2.jpg', 'apple_3.jpg', 'apple_4.jpg',
-            'apple_7.jpg', 'apple_9.jpg', 'apple_13.jpg', 'apple_22.jpg',
-            'apple_40.jpg', 'apple_41.jpg', 'apple_42.jpg', 'apple_44.jpg',
-            'apple_47.jpg', 'apple_49.jpg', 'apple_50.jpg', 'apple_51.jpg',
-            'apple_52.jpg'
-        ];
+    // Verified training images
+    this.appleFiles = [
+      "apple_1.jpg",
+      "apple_2.jpg",
+      "apple_3.jpg",
+      "apple_4.jpg",
+      "apple_7.jpg",
+      "apple_9.jpg",
+      "apple_13.jpg",
+      "apple_22.jpg",
+      "apple_40.jpg",
+      "apple_41.jpg",
+      "apple_42.jpg",
+      "apple_44.jpg",
+      "apple_47.jpg",
+      "apple_49.jpg",
+      "apple_50.jpg",
+      "apple_51.jpg",
+      "apple_52.jpg",
+    ];
 
-        this.bananaFiles = [
-            'banana_1.jpg', 'banana_2.jpg', 'banana_3.jpg', 'banana_4.jpg',
-            'banana_5.jpg', 'banana_7.jpg', 'banana_8.jpg', 'banana_10.jpg',
-            'banana_11.jpg', 'banana_13.jpg', 'banana_14.jpg', 'banana_15.jpg',
-            'banana_16.jpg', 'banana_17.jpg'
-        ];
-    }
+    this.bananaFiles = [
+      "banana_1.jpg",
+      "banana_2.jpg",
+      "banana_3.jpg",
+      "banana_4.jpg",
+      "banana_5.jpg",
+      "banana_7.jpg",
+      "banana_8.jpg",
+      "banana_10.jpg",
+      "banana_11.jpg",
+      "banana_13.jpg",
+      "banana_14.jpg",
+      "banana_15.jpg",
+      "banana_16.jpg",
+      "banana_17.jpg",
+    ];
+  }
 
-    async init() {
-        await this.loadImages();
-        this.createModel();
-    }
+  async init() {
+    await this.loadImages();
+    this.createModel();
+  }
 
-    createModel() {
-        // Build the neural network
-        this.model = tf.sequential({
-            layers: [
-                // Layer 1: First convolutional layer
-                tf.layers.conv2d({
-                    inputShape: [64, 64, 3],
-                    filters: 16,
-                    kernelSize: 3,
-                    activation: 'relu'
-                }),
-                tf.layers.maxPooling2d({ poolSize: 2 }),
+  createModel() {
+    // Build the neural network
+    this.model = tf.sequential({
+      layers: [
+        // Layer 1: First convolutional layer
+        tf.layers.conv2d({
+          inputShape: [64, 64, 3],
+          filters: 16,
+          kernelSize: 3,
+          activation: "relu",
+        }),
+        tf.layers.maxPooling2d({ poolSize: 2 }),
 
-                // Layer 2: Second convolutional layer
-                tf.layers.conv2d({
-                    filters: 32,
-                    kernelSize: 3,
-                    activation: 'relu'
-                }),
-                tf.layers.maxPooling2d({ poolSize: 2 }),
+        // Layer 2: Second convolutional layer
+        tf.layers.conv2d({
+          filters: 32,
+          kernelSize: 3,
+          activation: "relu",
+        }),
+        tf.layers.maxPooling2d({ poolSize: 2 }),
 
-                // Layer 3: Third convolutional layer
-                tf.layers.conv2d({
-                    filters: 32,
-                    kernelSize: 3,
-                    activation: 'relu'
-                }),
-                tf.layers.maxPooling2d({ poolSize: 2 }),
+        // Layer 3: Third convolutional layer
+        tf.layers.conv2d({
+          filters: 32,
+          kernelSize: 3,
+          activation: "relu",
+        }),
+        tf.layers.maxPooling2d({ poolSize: 2 }),
 
-                // Flatten and dense layers
-                tf.layers.flatten(),
-                tf.layers.dense({ units: 64, activation: 'relu' }),
-                tf.layers.dropout({ rate: 0.5 }),
-                tf.layers.dense({ units: 2, activation: 'softmax' })
-            ]
-        });
+        // Flatten and dense layers
+        tf.layers.flatten(),
+        tf.layers.dense({ units: 64, activation: "relu" }),
+        tf.layers.dropout({ rate: 0.5 }),
+        tf.layers.dense({ units: 2, activation: "softmax" }),
+      ],
+    });
 
-        // Configure training
-        this.model.compile({
-            optimizer: tf.train.adam(0.001),
-            loss: 'categoricalCrossentropy',
-            metrics: ['accuracy']
-        });
-    }
+    // Configure training
+    this.model.compile({
+      optimizer: tf.train.adam(0.001),
+      loss: "categoricalCrossentropy",
+      metrics: ["accuracy"],
+    });
+  }
 
-    preprocessImage(img) {
-        return tf.tidy(() => {
-            // Convert to tensor
-            let tensor = tf.browser.fromPixels(img);
+  preprocessImage(img) {
+    return tf.tidy(() => {
+      // Convert to tensor
+      let tensor = tf.browser.fromPixels(img);
 
-            // Resize to 64×64
-            tensor = tf.image.resizeBilinear(tensor, [64, 64]);
+      // Resize to 64×64
+      tensor = tf.image.resizeBilinear(tensor, [64, 64]);
 
-            // Normalize to [0, 1]
-            tensor = tensor.div(255.0);
+      // Normalize to [0, 1]
+      tensor = tensor.div(255.0);
 
-            return tensor;
-        });
-    }
+      return tensor;
+    });
+  }
 
-    async startTraining() {
-        // Prepare data
-        const images = this.trainingData.map(d => this.preprocessImage(d.img));
-        const labels = this.trainingData.map(d => d.label);
+  async startTraining() {
+    // Prepare data
+    const images = this.trainingData.map((d) => this.preprocessImage(d.img));
+    const labels = this.trainingData.map((d) => d.label);
 
-        const xs = tf.stack(images);
-        const ys = tf.oneHot(tf.tensor1d(labels, 'int32'), 2);
+    const xs = tf.stack(images);
+    const ys = tf.oneHot(tf.tensor1d(labels, "int32"), 2);
 
-        // Train!
-        await this.model.fit(xs, ys, {
-            epochs: 20,
-            batchSize: 4,
-            shuffle: true,
-            callbacks: {
-                onEpochEnd: (epoch, logs) => {
-                    console.log(`Epoch ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, accuracy = ${(logs.acc * 100).toFixed(1)}%`);
-                }
-            }
-        });
+    // Train!
+    await this.model.fit(xs, ys, {
+      epochs: 20,
+      batchSize: 4,
+      shuffle: true,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          console.log(
+            `Epoch ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, accuracy = ${(logs.acc * 100).toFixed(1)}%`,
+          );
+        },
+      },
+    });
 
-        // Cleanup
-        xs.dispose();
-        ys.dispose();
-        images.forEach(img => img.dispose());
-    }
+    // Cleanup
+    xs.dispose();
+    ys.dispose();
+    images.forEach((img) => img.dispose());
+  }
 
-    async predict(img) {
-        return tf.tidy(() => {
-            const tensor = this.preprocessImage(img);
-            const batched = tensor.expandDims(0);
-            const prediction = this.model.predict(batched);
-            const values = prediction.dataSync();
+  async predict(img) {
+    return tf.tidy(() => {
+      const tensor = this.preprocessImage(img);
+      const batched = tensor.expandDims(0);
+      const prediction = this.model.predict(batched);
+      const values = prediction.dataSync();
 
-            const classIndex = values[0] > values[1] ? 0 : 1;
-            const confidence = Math.max(values[0], values[1]);
+      const classIndex = values[0] > values[1] ? 0 : 1;
+      const confidence = Math.max(values[0], values[1]);
 
-            return {
-                class: classIndex,
-                className: this.classNames[classIndex],
-                confidence: confidence
-            };
-        });
-    }
+      return {
+        class: classIndex,
+        className: this.classNames[classIndex],
+        confidence: confidence,
+      };
+    });
+  }
 }
 ```
 
 ### Running the Demo
 
 **Setup:**
+
 ```bash
 cd ~/technical-discussion/ai/demo
 npm start
@@ -824,94 +866,94 @@ Our model consists of 10 layers total (7 trainable + 3 pooling):
 ```javascript
 // Layer-by-layer specification
 const architecture = [
-    {
-        name: 'Conv2D #1',
-        type: 'Convolution',
-        code: 'tf.layers.conv2d({ inputShape: [64,64,3], filters: 16, kernelSize: 3, activation: "relu" })',
-        inputShape: [64, 64, 3],
-        outputShape: [62, 62, 16],
-        parameters: 448,
-        computation: '62×62×16×3×3×3 = 554,688 operations'
-    },
-    {
-        name: 'MaxPool #1',
-        type: 'Pooling',
-        code: 'tf.layers.maxPooling2d({ poolSize: 2 })',
-        inputShape: [62, 62, 16],
-        outputShape: [31, 31, 16],
-        parameters: 0,
-        computation: 'Select max from each 2×2 region'
-    },
-    {
-        name: 'Conv2D #2',
-        type: 'Convolution',
-        code: 'tf.layers.conv2d({ filters: 32, kernelSize: 3, activation: "relu" })',
-        inputShape: [31, 31, 16],
-        outputShape: [29, 29, 32],
-        parameters: 4640,
-        computation: '29×29×32×3×3×16 = 4,332,288 operations'
-    },
-    {
-        name: 'MaxPool #2',
-        type: 'Pooling',
-        code: 'tf.layers.maxPooling2d({ poolSize: 2 })',
-        inputShape: [29, 29, 32],
-        outputShape: [14, 14, 32],
-        parameters: 0
-    },
-    {
-        name: 'Conv2D #3',
-        type: 'Convolution',
-        code: 'tf.layers.conv2d({ filters: 32, kernelSize: 3, activation: "relu" })',
-        inputShape: [14, 14, 32],
-        outputShape: [12, 12, 32],
-        parameters: 9248,
-        computation: '12×12×32×3×3×32 = 1,327,104 operations'
-    },
-    {
-        name: 'MaxPool #3',
-        type: 'Pooling',
-        code: 'tf.layers.maxPooling2d({ poolSize: 2 })',
-        inputShape: [12, 12, 32],
-        outputShape: [6, 6, 32],
-        parameters: 0
-    },
-    {
-        name: 'Flatten',
-        type: 'Reshape',
-        code: 'tf.layers.flatten()',
-        inputShape: [6, 6, 32],
-        outputShape: [1152],
-        parameters: 0,
-        computation: 'Reshape 3D to 1D array'
-    },
-    {
-        name: 'Dense',
-        type: 'Fully Connected',
-        code: 'tf.layers.dense({ units: 64, activation: "relu" })',
-        inputShape: [1152],
-        outputShape: [64],
-        parameters: 73792,  // (1152 × 64) + 64
-        computation: '1152×64 = 73,728 operations'
-    },
-    {
-        name: 'Dropout',
-        type: 'Regularization',
-        code: 'tf.layers.dropout({ rate: 0.5 })',
-        inputShape: [64],
-        outputShape: [64],
-        parameters: 0,
-        computation: 'Randomly zero 50% of values during training'
-    },
-    {
-        name: 'Dense (Output)',
-        type: 'Fully Connected',
-        code: 'tf.layers.dense({ units: 2, activation: "softmax" })',
-        inputShape: [64],
-        outputShape: [2],
-        parameters: 130,  // (64 × 2) + 2
-        computation: '64×2 = 128 operations + softmax'
-    }
+  {
+    name: "Conv2D #1",
+    type: "Convolution",
+    code: 'tf.layers.conv2d({ inputShape: [64,64,3], filters: 16, kernelSize: 3, activation: "relu" })',
+    inputShape: [64, 64, 3],
+    outputShape: [62, 62, 16],
+    parameters: 448,
+    computation: "62×62×16×3×3×3 = 554,688 operations",
+  },
+  {
+    name: "MaxPool #1",
+    type: "Pooling",
+    code: "tf.layers.maxPooling2d({ poolSize: 2 })",
+    inputShape: [62, 62, 16],
+    outputShape: [31, 31, 16],
+    parameters: 0,
+    computation: "Select max from each 2×2 region",
+  },
+  {
+    name: "Conv2D #2",
+    type: "Convolution",
+    code: 'tf.layers.conv2d({ filters: 32, kernelSize: 3, activation: "relu" })',
+    inputShape: [31, 31, 16],
+    outputShape: [29, 29, 32],
+    parameters: 4640,
+    computation: "29×29×32×3×3×16 = 4,332,288 operations",
+  },
+  {
+    name: "MaxPool #2",
+    type: "Pooling",
+    code: "tf.layers.maxPooling2d({ poolSize: 2 })",
+    inputShape: [29, 29, 32],
+    outputShape: [14, 14, 32],
+    parameters: 0,
+  },
+  {
+    name: "Conv2D #3",
+    type: "Convolution",
+    code: 'tf.layers.conv2d({ filters: 32, kernelSize: 3, activation: "relu" })',
+    inputShape: [14, 14, 32],
+    outputShape: [12, 12, 32],
+    parameters: 9248,
+    computation: "12×12×32×3×3×32 = 1,327,104 operations",
+  },
+  {
+    name: "MaxPool #3",
+    type: "Pooling",
+    code: "tf.layers.maxPooling2d({ poolSize: 2 })",
+    inputShape: [12, 12, 32],
+    outputShape: [6, 6, 32],
+    parameters: 0,
+  },
+  {
+    name: "Flatten",
+    type: "Reshape",
+    code: "tf.layers.flatten()",
+    inputShape: [6, 6, 32],
+    outputShape: [1152],
+    parameters: 0,
+    computation: "Reshape 3D to 1D array",
+  },
+  {
+    name: "Dense",
+    type: "Fully Connected",
+    code: 'tf.layers.dense({ units: 64, activation: "relu" })',
+    inputShape: [1152],
+    outputShape: [64],
+    parameters: 73792, // (1152 × 64) + 64
+    computation: "1152×64 = 73,728 operations",
+  },
+  {
+    name: "Dropout",
+    type: "Regularization",
+    code: "tf.layers.dropout({ rate: 0.5 })",
+    inputShape: [64],
+    outputShape: [64],
+    parameters: 0,
+    computation: "Randomly zero 50% of values during training",
+  },
+  {
+    name: "Dense (Output)",
+    type: "Fully Connected",
+    code: 'tf.layers.dense({ units: 2, activation: "softmax" })',
+    inputShape: [64],
+    outputShape: [2],
+    parameters: 130, // (64 × 2) + 2
+    computation: "64×2 = 128 operations + softmax",
+  },
 ];
 ```
 
@@ -1027,11 +1069,13 @@ OUTPUT: 94% Apple, 6% Banana
 ### What Each Layer Learns
 
 **Layer 1 (Conv2D #1):**
+
 - Basic edge detection (horizontal, vertical, diagonal)
 - Color detection (red regions, green regions, yellow regions)
 - Texture patterns (smooth vs rough)
 
 Example learned filters:
+
 ```
 Filter 1: Horizontal edge detector
 [-1, -1, -1]
@@ -1050,11 +1094,13 @@ Filter 3: Vertical edge detector
 ```
 
 **Layer 2 (Conv2D #2):**
+
 - Combines Layer 1 features
 - Detects shapes: circles, curves, straight lines
 - Color combinations: red + round, yellow + curved
 
 **Layer 3 (Conv2D #3):**
+
 - Complex object parts
 - Stem detection (apples have stems)
 - Banana curvature
@@ -1062,6 +1108,7 @@ Filter 3: Vertical edge detector
 - Bunch patterns (multiple bananas together)
 
 **Dense Layer:**
+
 - High-level reasoning
 - "Red + round + stem + smooth = APPLE"
 - "Yellow + curved + elongated = BANANA"
@@ -1077,40 +1124,40 @@ An epoch is one complete pass through all training data. Here's the detailed pro
 
 ```javascript
 async function trainOneEpoch(model, images, labels) {
-    let totalLoss = 0;
-    let correctPredictions = 0;
+  let totalLoss = 0;
+  let correctPredictions = 0;
 
-    // Go through each training example
-    for (let i = 0; i < images.length; i++) {
-        const image = images[i];
-        const label = labels[i];
+  // Go through each training example
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
+    const label = labels[i];
 
-        // 1. FORWARD PASS: Make prediction
-        const prediction = model.predict(image);
-        // Result: [0.7, 0.3] means "70% apple, 30% banana"
+    // 1. FORWARD PASS: Make prediction
+    const prediction = model.predict(image);
+    // Result: [0.7, 0.3] means "70% apple, 30% banana"
 
-        // 2. CALCULATE LOSS: How wrong were we?
-        const loss = categoricalCrossentropy(prediction, label);
-        totalLoss += loss;
+    // 2. CALCULATE LOSS: How wrong were we?
+    const loss = categoricalCrossentropy(prediction, label);
+    totalLoss += loss;
 
-        // 3. BACKPROPAGATION: Compute gradients
-        const gradients = computeGradients(loss, model.weights);
+    // 3. BACKPROPAGATION: Compute gradients
+    const gradients = computeGradients(loss, model.weights);
 
-        // 4. UPDATE WEIGHTS: Adjust to reduce error
-        updateWeights(model.weights, gradients, learningRate);
+    // 4. UPDATE WEIGHTS: Adjust to reduce error
+    updateWeights(model.weights, gradients, learningRate);
 
-        // 5. TRACK ACCURACY
-        const predictedClass = prediction[0] > prediction[1] ? 0 : 1;
-        if (predictedClass === label) {
-            correctPredictions++;
-        }
+    // 5. TRACK ACCURACY
+    const predictedClass = prediction[0] > prediction[1] ? 0 : 1;
+    if (predictedClass === label) {
+      correctPredictions++;
     }
+  }
 
-    // Calculate metrics for this epoch
-    const avgLoss = totalLoss / images.length;
-    const accuracy = correctPredictions / images.length;
+  // Calculate metrics for this epoch
+  const avgLoss = totalLoss / images.length;
+  const accuracy = correctPredictions / images.length;
 
-    return { loss: avgLoss, accuracy: accuracy };
+  return { loss: avgLoss, accuracy: accuracy };
 }
 ```
 
@@ -1119,36 +1166,37 @@ async function trainOneEpoch(model, images, labels) {
 ```javascript
 // What happens when you call model.fit()
 async function train(epochs = 20) {
-    console.log("Starting training with random weights...");
+  console.log("Starting training with random weights...");
 
-    for (let epoch = 0; epoch < epochs; epoch++) {
-        // Shuffle data each epoch (better learning)
-        shuffle(trainingData);
+  for (let epoch = 0; epoch < epochs; epoch++) {
+    // Shuffle data each epoch (better learning)
+    shuffle(trainingData);
 
-        // Train on all data
-        const metrics = await trainOneEpoch(model, images, labels);
+    // Train on all data
+    const metrics = await trainOneEpoch(model, images, labels);
 
-        console.log(`Epoch ${epoch + 1}/${epochs}`);
-        console.log(`  Loss: ${metrics.loss.toFixed(4)}`);
-        console.log(`  Accuracy: ${(metrics.accuracy * 100).toFixed(1)}%`);
+    console.log(`Epoch ${epoch + 1}/${epochs}`);
+    console.log(`  Loss: ${metrics.loss.toFixed(4)}`);
+    console.log(`  Accuracy: ${(metrics.accuracy * 100).toFixed(1)}%`);
 
-        // Update UI
-        updateChart(epoch, metrics.loss, metrics.accuracy);
+    // Update UI
+    updateChart(epoch, metrics.loss, metrics.accuracy);
 
-        // Every few epochs, test on validation data
-        if ((epoch + 1) % 3 === 0) {
-            const testPredictions = testModel();
-            displayPredictions(testPredictions);
-        }
+    // Every few epochs, test on validation data
+    if ((epoch + 1) % 3 === 0) {
+      const testPredictions = testModel();
+      displayPredictions(testPredictions);
     }
+  }
 
-    console.log("Training complete!");
+  console.log("Training complete!");
 }
 ```
 
 ### Observing Training in Real-Time
 
 **Epoch 1:**
+
 ```
 Loss: 0.6931  (Random weights, essentially guessing)
 Accuracy: 52%  (Barely better than 50/50 coin flip)
@@ -1160,6 +1208,7 @@ Predictions:
 ```
 
 **Epoch 5:**
+
 ```
 Loss: 0.4210
 Accuracy: 72%  (Starting to learn!)
@@ -1171,6 +1220,7 @@ Predictions:
 ```
 
 **Epoch 10:**
+
 ```
 Loss: 0.2483
 Accuracy: 88%  (Learning well)
@@ -1182,6 +1232,7 @@ Predictions:
 ```
 
 **Epoch 20:**
+
 ```
 Loss: 0.1524
 Accuracy: 96%  (Nearly perfect!)
@@ -1198,16 +1249,16 @@ Categorical Cross-Entropy measures how far the prediction is from the truth:
 
 ```javascript
 function categoricalCrossentropy(prediction, actualLabel) {
-    // Example: Showed an apple (label = [1, 0])
-    //          Model predicted [0.3, 0.7] (thought it was banana)
+  // Example: Showed an apple (label = [1, 0])
+  //          Model predicted [0.3, 0.7] (thought it was banana)
 
-    let loss = 0;
-    for (let i = 0; i < prediction.length; i++) {
-        // Only the correct class contributes to loss
-        loss += -actualLabel[i] * Math.log(prediction[i]);
-    }
+  let loss = 0;
+  for (let i = 0; i < prediction.length; i++) {
+    // Only the correct class contributes to loss
+    loss += -actualLabel[i] * Math.log(prediction[i]);
+  }
 
-    return loss;
+  return loss;
 }
 
 // Examples:
@@ -1230,25 +1281,25 @@ Backpropagation computes how each weight contributed to the error:
 ```javascript
 // Simplified example for understanding
 function backpropagate(loss, network) {
-    // Start from output layer, work backwards
-    let gradientFromNextLayer = loss;
+  // Start from output layer, work backwards
+  let gradientFromNextLayer = loss;
 
-    for (let layer of network.layers.reverse()) {
-        for (let weight of layer.weights) {
-            // Chain rule of calculus:
-            // gradient = how output changed due to this weight
-            //          × gradient from layers above
+  for (let layer of network.layers.reverse()) {
+    for (let weight of layer.weights) {
+      // Chain rule of calculus:
+      // gradient = how output changed due to this weight
+      //          × gradient from layers above
 
-            const localGradient = calculateLocalGradient(weight);
-            const totalGradient = localGradient * gradientFromNextLayer;
+      const localGradient = calculateLocalGradient(weight);
+      const totalGradient = localGradient * gradientFromNextLayer;
 
-            // Store for weight update
-            weight.gradient = totalGradient;
-        }
-
-        // Pass gradient to previous layer
-        gradientFromNextLayer = calculateGradientForPreviousLayer(layer);
+      // Store for weight update
+      weight.gradient = totalGradient;
     }
+
+    // Pass gradient to previous layer
+    gradientFromNextLayer = calculateGradientForPreviousLayer(layer);
+  }
 }
 ```
 
@@ -1260,23 +1311,25 @@ Adam is more sophisticated than simple gradient descent:
 
 ```javascript
 function adamUpdate(weight, gradient, timestep) {
-    const beta1 = 0.9;   // Momentum decay rate
-    const beta2 = 0.999; // Velocity decay rate
-    const epsilon = 1e-7;
-    const learningRate = 0.001;
+  const beta1 = 0.9; // Momentum decay rate
+  const beta2 = 0.999; // Velocity decay rate
+  const epsilon = 1e-7;
+  const learningRate = 0.001;
 
-    // Update momentum (exponential moving average of gradients)
-    weight.momentum = beta1 * weight.momentum + (1 - beta1) * gradient;
+  // Update momentum (exponential moving average of gradients)
+  weight.momentum = beta1 * weight.momentum + (1 - beta1) * gradient;
 
-    // Update velocity (exponential moving average of squared gradients)
-    weight.velocity = beta2 * weight.velocity + (1 - beta2) * (gradient ** 2);
+  // Update velocity (exponential moving average of squared gradients)
+  weight.velocity = beta2 * weight.velocity + (1 - beta2) * gradient ** 2;
 
-    // Bias correction (important for early timesteps)
-    const momentumCorrected = weight.momentum / (1 - Math.pow(beta1, timestep));
-    const velocityCorrected = weight.velocity / (1 - Math.pow(beta2, timestep));
+  // Bias correction (important for early timesteps)
+  const momentumCorrected = weight.momentum / (1 - Math.pow(beta1, timestep));
+  const velocityCorrected = weight.velocity / (1 - Math.pow(beta2, timestep));
 
-    // Update weight
-    weight.value -= learningRate * momentumCorrected / (Math.sqrt(velocityCorrected) + epsilon);
+  // Update weight
+  weight.value -=
+    (learningRate * momentumCorrected) /
+    (Math.sqrt(velocityCorrected) + epsilon);
 }
 ```
 
@@ -1287,12 +1340,14 @@ function adamUpdate(weight, gradient, timestep) {
 3. **Bias correction:** Works well from the very first iteration
 
 **Simple gradient descent:**
+
 ```javascript
 weight -= learningRate * gradient;
 // Same step size for all weights, can be unstable
 ```
 
 **Adam:**
+
 ```javascript
 weight -= adaptiveLearningRate * smoothedGradient;
 // Customized for each weight, more stable
@@ -1309,24 +1364,25 @@ A parameter is a number that the model learns during training. In our network, w
 ```javascript
 // Before training: RANDOM
 parameters = [
-    0.23,    // Weight from input pixel 0 to filter 1
-    -0.67,   // Weight from input pixel 1 to filter 1
-    0.91,    // Weight from input pixel 2 to filter 1
-    // ... 88,255 more
+  0.23, // Weight from input pixel 0 to filter 1
+  -0.67, // Weight from input pixel 1 to filter 1
+  0.91, // Weight from input pixel 2 to filter 1
+  // ... 88,255 more
 ];
 
 // After training: OPTIMIZED
 parameters = [
-    0.87,    // Learned: "look for red color"
-    -0.34,   // Learned: "ignore this pixel"
-    0.56,    // Learned: "round shape indicator"
-    // ... 88,255 more
+  0.87, // Learned: "look for red color"
+  -0.34, // Learned: "ignore this pixel"
+  0.56, // Learned: "round shape indicator"
+  // ... 88,255 more
 ];
 ```
 
 ### Parameter Calculation by Layer
 
 **Conv2D Layer:**
+
 ```
 Parameters = (kernelWidth × kernelHeight × inputChannels + 1) × numFilters
 
@@ -1343,6 +1399,7 @@ Breakdown:
 ```
 
 **Dense Layer:**
+
 ```
 Parameters = (inputSize × outputSize) + outputSize
 
@@ -1387,6 +1444,7 @@ Speed: ~400 million operations per second
 ```
 
 For comparison:
+
 - Our demo: 88K parameters, 31 images, 30 seconds
 - ResNet-50: 25M parameters, 1M images, days on GPU
 - GPT-3: 175B parameters, entire internet, months on supercomputers
@@ -1431,15 +1489,16 @@ The model has only two choices. It MUST pick one:
 
 ```javascript
 function predict(grapefruitImage) {
-    const output = model.predict(grapefruitImage);
-    // Result: [0.65, 0.35]
-    //          Apple Banana
+  const output = model.predict(grapefruitImage);
+  // Result: [0.65, 0.35]
+  //          Apple Banana
 
-    // Since 0.65 > 0.35, the model says "Apple"
+  // Since 0.65 > 0.35, the model says "Apple"
 }
 ```
 
 **The model's reasoning:**
+
 1. "Is this more apple-like or banana-like?"
 2. Grapefruit is round (like apple), not curved (like banana)
 3. Grapefruit is solid color (like apple), not yellow-elongated (like banana)
@@ -1452,22 +1511,22 @@ function predict(grapefruitImage) {
 Our model has only two output neurons:
 
 ```javascript
-output = [probability_apple, probability_banana]
+output = [probability_apple, probability_banana];
 // These always sum to 1.0
 // EVERYTHING gets classified as one or the other
 ```
 
 **What gets misclassified:**
 
-| Input | Prediction | Why |
-|-------|------------|-----|
-| Grapefruit | Apple (65%) | Round, solid color |
-| Orange | Apple (72%) | Round, orange-red color |
-| Pear | Apple (58%) | Roundish, could be green |
-| Corn | Banana (55%) | Yellow, elongated |
-| Zucchini | Banana (61%) | Green-yellow, elongated |
-| Basketball | Apple (68%) | Round, orange-red |
-| School bus | Banana (89%) | Yellow, elongated |
+| Input      | Prediction   | Why                      |
+| ---------- | ------------ | ------------------------ |
+| Grapefruit | Apple (65%)  | Round, solid color       |
+| Orange     | Apple (72%)  | Round, orange-red color  |
+| Pear       | Apple (58%)  | Roundish, could be green |
+| Corn       | Banana (55%) | Yellow, elongated        |
+| Zucchini   | Banana (61%) | Green-yellow, elongated  |
+| Basketball | Apple (68%)  | Round, orange-red        |
+| School bus | Banana (89%) | Yellow, elongated        |
 
 The model is doing EXACTLY what we trained it to do: pick the closest match from two options.
 
@@ -1477,17 +1536,17 @@ The model is doing EXACTLY what we trained it to do: pick the closest match from
 
 ```javascript
 // Instead of 2 outputs:
-output = [prob_apple, prob_banana]
+output = [prob_apple, prob_banana];
 
 // Have many outputs:
 output = [
-    prob_apple,
-    prob_banana,
-    prob_orange,
-    prob_grapefruit,
-    prob_other_fruit,
-    prob_not_fruit
-]
+  prob_apple,
+  prob_banana,
+  prob_orange,
+  prob_grapefruit,
+  prob_other_fruit,
+  prob_not_fruit,
+];
 ```
 
 Now the model can say "this is a grapefruit" instead of forcing it into apple/banana.
@@ -1496,15 +1555,15 @@ Now the model can say "this is a grapefruit" instead of forcing it into apple/ba
 
 ```javascript
 function predictWithConfidence(image) {
-    const prediction = model.predict(image);
-    const maxConfidence = Math.max(...prediction);
+  const prediction = model.predict(image);
+  const maxConfidence = Math.max(...prediction);
 
-    // Reject low-confidence predictions
-    if (maxConfidence < 0.80) {
-        return "Unknown - not confident enough";
-    }
+  // Reject low-confidence predictions
+  if (maxConfidence < 0.8) {
+    return "Unknown - not confident enough";
+  }
 
-    return prediction[0] > prediction[1] ? "Apple" : "Banana";
+  return prediction[0] > prediction[1] ? "Apple" : "Banana";
 }
 
 // Examples:
@@ -1519,21 +1578,22 @@ Train a separate model to detect "does this look like the training data?"
 
 ```javascript
 function predictSafely(image) {
-    // First: Is this similar to training data?
-    const similarity = checkSimilarity(image, trainingData);
+  // First: Is this similar to training data?
+  const similarity = checkSimilarity(image, trainingData);
 
-    if (similarity < 0.7) {
-        return "This doesn't look like apples or bananas";
-    }
+  if (similarity < 0.7) {
+    return "This doesn't look like apples or bananas";
+  }
 
-    // Only then: Classify
-    return model.predict(image);
+  // Only then: Classify
+  return model.predict(image);
 }
 ```
 
 ### Would More Training Help?
 
 **More training data (same classes):**
+
 ```
 Current: 17 apples, 14 bananas
 With 100 apples, 100 bananas:
@@ -1543,6 +1603,7 @@ With 100 apples, 100 bananas:
 ```
 
 **More epochs:**
+
 ```
 Current: 20 epochs
 With 100 epochs:
@@ -1553,6 +1614,7 @@ With 100 epochs:
 ```
 
 **Overfitting example:**
+
 ```
 Epoch 20:  Train accuracy: 96%, Test accuracy: 92% ✅ Good
 Epoch 50:  Train accuracy: 99%, Test accuracy: 88% ⚠️ Overfitting
@@ -1565,12 +1627,14 @@ Model at epoch 100:
 ```
 
 **Signs of overfitting:**
+
 - Training accuracy keeps improving
 - Test accuracy plateaus or decreases
 - Loss on training data near zero
 - Loss on test data increasing
 
 **Prevention:**
+
 - Dropout layers (we use 50% dropout)
 - Early stopping (stop when test accuracy stops improving)
 - More training data
@@ -1583,6 +1647,7 @@ The grapefruit "problem" isn't fixable with more training. It's a **design limit
 **The real lesson:** AI models only solve the problem you give them. We gave it "pick apple or banana" – it does that perfectly. We didn't give it "detect unknown fruits" – so it doesn't.
 
 This applies to all AI systems, including ChatGPT:
+
 - ChatGPT is trained to "generate plausible next token"
 - Not trained to "only say true things"
 - Result: Sometimes generates plausible-sounding nonsense (hallucinations)
@@ -1644,18 +1709,21 @@ Cost:                              Cost:
 The math is identical. What scales:
 
 1. **Model capacity:**
+
    ```
    Our model: Can learn "apple vs banana"
    GPT-4: Can learn grammar, facts, reasoning, coding, etc.
    ```
 
 2. **Training data:**
+
    ```
    Our model: 31 images (a few KB)
    GPT-4: 13 trillion tokens (~10 TB of text)
    ```
 
 3. **Computation:**
+
    ```
    Our model: Billions of operations
    GPT-4: 10^25 operations (10 septillion)
@@ -1674,17 +1742,17 @@ ChatGPT predicts the next word, just like our model predicts apple/banana:
 ```javascript
 // Our model
 function predictFruit(image) {
-    return [probability_apple, probability_banana];
+  return [probability_apple, probability_banana];
 }
 
 // ChatGPT (simplified)
 function predictNextWord(textSoFar) {
-    return [
-        prob_word1,  // "the"
-        prob_word2,  // "a"
-        prob_word3,  // "is"
-        // ... 50,000 more words
-    ];
+  return [
+    prob_word1, // "the"
+    prob_word2, // "a"
+    prob_word3, // "is"
+    // ... 50,000 more words
+  ];
 }
 ```
 
@@ -1714,6 +1782,7 @@ Result: "The capital of France is Paris."
 ```
 
 **But it's trained on trillions of examples, so it learns:**
+
 - Grammar rules
 - Factual knowledge
 - Reasoning patterns
@@ -1728,21 +1797,19 @@ Our model is deterministic (always picks highest probability). ChatGPT uses temp
 
 ```javascript
 function sampleWithTemperature(probabilities, temperature) {
-    // temperature = 0: Always pick highest (deterministic)
-    // temperature = 1: Sample according to probabilities
-    // temperature = 2: More random
+  // temperature = 0: Always pick highest (deterministic)
+  // temperature = 1: Sample according to probabilities
+  // temperature = 2: More random
 
-    // Adjust probabilities
-    const adjusted = probabilities.map(p =>
-        Math.pow(p, 1/temperature)
-    );
+  // Adjust probabilities
+  const adjusted = probabilities.map((p) => Math.pow(p, 1 / temperature));
 
-    // Normalize
-    const sum = adjusted.reduce((a, b) => a + b);
-    const final = adjusted.map(p => p / sum);
+  // Normalize
+  const sum = adjusted.reduce((a, b) => a + b);
+  const final = adjusted.map((p) => p / sum);
 
-    // Sample randomly
-    return weightedRandom(final);
+  // Sample randomly
+  return weightedRandom(final);
 }
 
 // Example:
@@ -1844,6 +1911,7 @@ Same algorithm. Different scale.
 ```
 
 **Why this works:**
+
 - No retraining needed (expensive, slow)
 - Always up-to-date (just update database)
 - Company data stays private
@@ -1853,15 +1921,15 @@ Same algorithm. Different scale.
 
 ```javascript
 async function ragQuery(userQuestion) {
-    // 1. Convert question to embedding
-    const questionEmbedding = await getEmbedding(userQuestion);
+  // 1. Convert question to embedding
+  const questionEmbedding = await getEmbedding(userQuestion);
 
-    // 2. Find similar documents
-    const relevantDocs = await vectorDB.search(questionEmbedding, limit=3);
+  // 2. Find similar documents
+  const relevantDocs = await vectorDB.search(questionEmbedding, (limit = 3));
 
-    // 3. Build augmented prompt
-    const context = relevantDocs.join('\n\n');
-    const prompt = `
+  // 3. Build augmented prompt
+  const context = relevantDocs.join("\n\n");
+  const prompt = `
 Context:
 ${context}
 
@@ -1871,39 +1939,44 @@ Answer based only on the context above. If the context doesn't contain
 the answer, say "I don't have that information."
     `;
 
-    // 4. Get ChatGPT response
-    const response = await chatgpt.complete(prompt);
+  // 4. Get ChatGPT response
+  const response = await chatgpt.complete(prompt);
 
-    return response;
+  return response;
 }
 ```
 
 ### Other Applications
 
 **Image Classification (like our demo):**
+
 - Medical imaging (detect tumors)
 - Quality control (detect defects)
 - Wildlife monitoring (identify species)
 - Agricultural (identify plant diseases)
 
 **Object Detection:**
+
 - Self-driving cars (detect pedestrians, signs)
 - Security (detect suspicious behavior)
 - Retail (count products on shelves)
 
 **Text Classification:**
+
 - Spam detection
 - Sentiment analysis (positive/negative reviews)
 - Content moderation
 - Document categorization
 
 **Recommendation Systems:**
+
 - Netflix (what to watch next)
 - Spotify (song recommendations)
 - E-commerce (product suggestions)
-All based on pattern recognition in user behavior
+  All based on pattern recognition in user behavior
 
 **Generative AI:**
+
 - ChatGPT (text generation)
 - DALL-E (image generation)
 - GitHub Copilot (code generation)
@@ -1918,30 +1991,35 @@ All use the same core concepts we explored: neural networks, forward/backward pa
 ### What We've Learned
 
 **Fundamentals:**
+
 - Machine learning finds patterns in data, not rules
 - Neural networks are layers of mathematical functions
 - Training adjusts weights through forward passes and backpropagation
 - Same principles from 1960s, but better tools and more compute
 
 **Our Demo:**
+
 - 88,258 parameters learned to distinguish apples from bananas
 - 7 layers transform images through progressive abstractions
 - 20 epochs of training took 30 seconds
 - Achieved 95% accuracy on 31 training images
 
 **Modern Tools:**
+
 - TensorFlow.js makes AI accessible in the browser
 - 20 lines of code → complete neural network
 - Decades of research abstracted into clean APIs
 - What required PhDs in 2005 is now a tutorial in 2024
 
 **Limitations:**
+
 - Models only solve the problems they're trained for
 - Binary classifiers must pick one of two options
 - More data/epochs ≠ always better (overfitting)
 - Understanding limitations is crucial
 
 **Scaling Up:**
+
 - Same algorithms power ChatGPT
 - Different scale: 88K parameters → 1.76 trillion
 - Different data: 31 images → entire internet
@@ -2006,6 +2084,7 @@ And we're just getting started.
 ## Appendix: Code References
 
 **Demo code location:**
+
 ```
 ~/technical-discussion/ai/demo/
 ├── index.html          - Frontend interface
@@ -2019,15 +2098,16 @@ And we're just getting started.
 
 **Key code sections:**
 
-| Component | File | Lines |
-|-----------|------|-------|
-| Model architecture | `js/app.js` | 121-156 |
-| Compilation | `js/app.js` | 158-162 |
-| Training loop | `js/app.js` | 220-259 |
+| Component           | File        | Lines   |
+| ------------------- | ----------- | ------- |
+| Model architecture  | `js/app.js` | 121-156 |
+| Compilation         | `js/app.js` | 158-162 |
+| Training loop       | `js/app.js` | 220-259 |
 | Image preprocessing | `js/app.js` | 316-332 |
-| Prediction | `js/app.js` | 452-464 |
+| Prediction          | `js/app.js` | 452-464 |
 
 **To run the demo:**
+
 ```bash
 cd ~/technical-discussion/ai/demo
 npm start
