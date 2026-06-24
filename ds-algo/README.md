@@ -10,7 +10,7 @@ The plan is **exposure-driven**: name-drop a wide range of concepts, but only te
 
 | Block | Time | What |
 |------:|-----:|------|
-| 1 | 5 min  | Kickoff + Big-O refresher (one slide of intuition, no formal proofs) |
+| 1 | 5 min  | Kickoff + Big-O refresher — see [00-big-o.md](00-big-o.md) |
 | 2 | 15 min | **Concept tour** — quick exposure to 6-ish data structures, ~3 min each |
 | 3 | 10 min | **BST quiz** — verbal only, no coding (see `04-trees-bst.md`) |
 | 4 | 15 min | **Palindrome** — code it together, two-pointer (see `PROBLEMS.md`) |
@@ -26,6 +26,7 @@ Each file follows the same shape: diagram, mental model, JS code, Big-O, FAQ.
 
 | File | Topic | Quizzed? |
 |------|-------|----------|
+| [00-big-o.md](00-big-o.md) | Big-O notation, growth classes, average/worst/amortized | preface |
 | [01-arrays.md](01-arrays.md) | Arrays, two-pointer | ✅ palindrome |
 | [02-hashmaps-objects.md](02-hashmaps-objects.md) | Objects, `Map`, hash collisions | ✅ two sum |
 | [03-stacks-queues.md](03-stacks-queues.md) | LIFO/FIFO, push/pop/shift | exposure |
